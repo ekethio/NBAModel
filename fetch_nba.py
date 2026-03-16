@@ -1,6 +1,6 @@
 from nba_api.stats.static import teams
 from nba_api.stats.endpoints import leaguegamelog
-from nba_api.library.http import NBAStatsHTTP
+import nba_api.library.http as nba_http
 import pandas as pd
 import json
 import os
@@ -11,8 +11,9 @@ SEASON = '2024-25'
 SEASON_TYPE = 'Regular Season'
 POINTS_THRESHOLD = 228
 
-# ── Fix: inject browser-like headers so stats.nba.com doesn't block GitHub Actions ──
-NBAStatsHTTP.headers = {
+# ── Patch browser-like headers onto whatever HTTP class this nba_api version uses ──
+# stats.nba.com blocks requests that don't look like a real browser (e.g. GitHub Actions)
+BROWSER_HEADERS = {
     'Host': 'stats.nba.com',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
     'Accept': 'application/json, text/plain, */*',
@@ -24,16 +25,24 @@ NBAStatsHTTP.headers = {
     'Referer': 'https://www.nba.com/',
     'Origin': 'https://www.nba.com',
 }
+patched = False
+for attr in dir(nba_http):
+    obj = getattr(nba_http, attr)
+    if isinstance(obj, type) and hasattr(obj, 'headers'):
+        obj.headers = BROWSER_HEADERS
+        print(f"Patched headers onto nba_http.{attr}")
+        patched = True
+if not patched:
+    print("Warning: could not find HTTP class to patch — trying anyway")
 
-def fetch_with_retry(fn, retries=5, delay=10):
-    """Call fn(), retrying on timeout up to `retries` times."""
+def fetch_with_retry(fn, retries=5, delay=15):
     for attempt in range(1, retries + 1):
         try:
             return fn()
         except Exception as e:
             if attempt == retries:
                 raise
-            print(f"Attempt {attempt} failed ({e}). Retrying in {delay}s...")
+            print(f"Attempt {attempt} failed: {e}. Retrying in {delay}s...")
             time.sleep(delay)
 
 print("Fetching game log...")
@@ -86,7 +95,7 @@ league_avg_pace_global   = float(pd.Series(list(game_pace.values())).mean())
 team_season_avg      = {}
 team_season_avg_pace = {}
 for team in nba_teams:
-    team_id   = team['id']
+    team_id    = team['id']
     team_games = all_games[all_games['TEAM_ID'] == team_id]
     combined_points = team_games['GAME_ID'].map(game_totals)
     combined_pace   = team_games['GAME_ID'].map(game_pace)
@@ -137,44 +146,40 @@ for team in nba_teams:
     adj_l3_pace = adjusted_avg(game_ids_recent, team_id, game_pace,   team_season_avg_pace, league_avg_pace_global,   3)
 
     pd_row = {
-        'team':      team_name,
-        'avgPts':    safe_mean(combined_points),
-        'homePts':   safe_mean(home_points),
-        'awayPts':   safe_mean(away_points),
-        'l20Pts':    safe_mean(combined_points.head(20), 20),
-        'l14Pts':    safe_mean(combined_points.head(14), 14),
-        'l7Pts':     safe_mean(combined_points.head(7),  7),
-        'adjL7Pts':  adj_l7_pts,
-        'l3Pts':     safe_mean(combined_points.head(3),  3),
-        'adjL3Pts':  adj_l3_pts,
-        'over228':   int((combined_points >= POINTS_THRESHOLD).sum()),
-        'games':     len(team_games),
+        'team':     team_name,
+        'avgPts':   safe_mean(combined_points),
+        'homePts':  safe_mean(home_points),
+        'awayPts':  safe_mean(away_points),
+        'l20Pts':   safe_mean(combined_points.head(20), 20),
+        'l14Pts':   safe_mean(combined_points.head(14), 14),
+        'l7Pts':    safe_mean(combined_points.head(7),  7),
+        'adjL7Pts': adj_l7_pts,
+        'l3Pts':    safe_mean(combined_points.head(3),  3),
+        'adjL3Pts': adj_l3_pts,
+        'over228':  int((combined_points >= POINTS_THRESHOLD).sum()),
+        'games':    len(team_games),
     }
-    avg  = pd_row['avgPts']  or 0
-    l20  = pd_row['l20Pts']  or 0
-    l14  = pd_row['l14Pts']  or 0
-    adjl7 = pd_row['adjL7Pts'] or 0
-    pd_row['ptsScore'] = round(avg*0.45 + l20*0.3 + l14*0.15 + adjl7*0.1, 1)
+    pd_row['ptsScore'] = round(
+        (pd_row['avgPts'] or 0)*0.45 + (pd_row['l20Pts'] or 0)*0.3 +
+        (pd_row['l14Pts'] or 0)*0.15 + (pd_row['adjL7Pts'] or 0)*0.1, 1)
     points_data.append(pd_row)
 
     pc_row = {
-        'team':       team_name,
-        'avgPace':    safe_mean(combined_pace_s),
-        'homePace':   safe_mean(home_pace_s),
-        'awayPace':   safe_mean(away_pace_s),
-        'l20Pace':    safe_mean(combined_pace_s.head(20), 20),
-        'l14Pace':    safe_mean(combined_pace_s.head(14), 14),
-        'l7Pace':     safe_mean(combined_pace_s.head(7),  7),
-        'adjL7Pace':  adj_l7_pace,
-        'l3Pace':     safe_mean(combined_pace_s.head(3),  3),
-        'adjL3Pace':  adj_l3_pace,
-        'games':      len(team_games),
+        'team':      team_name,
+        'avgPace':   safe_mean(combined_pace_s),
+        'homePace':  safe_mean(home_pace_s),
+        'awayPace':  safe_mean(away_pace_s),
+        'l20Pace':   safe_mean(combined_pace_s.head(20), 20),
+        'l14Pace':   safe_mean(combined_pace_s.head(14), 14),
+        'l7Pace':    safe_mean(combined_pace_s.head(7),  7),
+        'adjL7Pace': adj_l7_pace,
+        'l3Pace':    safe_mean(combined_pace_s.head(3),  3),
+        'adjL3Pace': adj_l3_pace,
+        'games':     len(team_games),
     }
-    avg2   = pc_row['avgPace']   or 0
-    l20p   = pc_row['l20Pace']   or 0
-    l14p   = pc_row['l14Pace']   or 0
-    adjl7p = pc_row['adjL7Pace'] or 0
-    pc_row['paceScore'] = round(avg2*0.45 + l20p*0.3 + l14p*0.15 + adjl7p*0.1, 1)
+    pc_row['paceScore'] = round(
+        (pc_row['avgPace'] or 0)*0.45 + (pc_row['l20Pace'] or 0)*0.3 +
+        (pc_row['l14Pace'] or 0)*0.15 + (pc_row['adjL7Pace'] or 0)*0.1, 1)
     pace_data.append(pc_row)
 
 # Per-team last-7 detail rows
@@ -186,8 +191,8 @@ for team in nba_teams:
     last7      = team_games.head(7)
     rows = []
     for _, row in last7.iterrows():
-        gid    = row['GAME_ID']
-        opp_id = game_opponent.get((gid, team_id))
+        gid          = row['GAME_ID']
+        opp_id       = game_opponent.get((gid, team_id))
         actual_total = float(game_totals.get(gid, 0))
         opp_pts_avg  = float(team_season_avg.get(opp_id, league_avg_points_global)) if opp_id else league_avg_points_global
         adj_total    = round(actual_total + (league_avg_points_global - opp_pts_avg), 1)
@@ -195,32 +200,31 @@ for team in nba_teams:
         opp_pace_avg = float(team_season_avg_pace.get(opp_id, league_avg_pace_global)) if opp_id else league_avg_pace_global
         adj_pace     = round(actual_pace + (league_avg_pace_global - opp_pace_avg), 1)
         rows.append({
-            'date':       row['GAME_DATE'],
-            'matchup':    row['MATCHUP'],
-            'wl':         row['WL'],
-            'pts':        int(row['PTS']),
-            'total':      actual_total,
-            'oppAvg':     round(opp_pts_avg, 1),
-            'adjTotal':   adj_total,
-            'pace':       actual_pace,
-            'oppPace':    round(opp_pace_avg, 1),
-            'adjPace':    adj_pace,
+            'date':     row['GAME_DATE'],
+            'matchup':  row['MATCHUP'],
+            'wl':       row['WL'],
+            'pts':      int(row['PTS']),
+            'total':    actual_total,
+            'oppAvg':   round(opp_pts_avg, 1),
+            'adjTotal': adj_total,
+            'pace':     actual_pace,
+            'oppPace':  round(opp_pace_avg, 1),
+            'adjPace':  adj_pace,
         })
     detail_data[team_name] = rows
 
-# Sort
 points_data.sort(key=lambda x: x['ptsScore'], reverse=True)
 pace_data.sort(key=lambda x: x['paceScore'], reverse=True)
 
 output = {
-    'updatedAt':          datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC'),
-    'season':             SEASON,
-    'leagueAvgPoints':    round(league_avg_points_global, 1),
-    'leagueAvgPace':      round(league_avg_pace_global, 1),
-    'pointsThreshold':    POINTS_THRESHOLD,
-    'pointsData':         points_data,
-    'paceData':           pace_data,
-    'detailData':         detail_data,
+    'updatedAt':       datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC'),
+    'season':          SEASON,
+    'leagueAvgPoints': round(league_avg_points_global, 1),
+    'leagueAvgPace':   round(league_avg_pace_global, 1),
+    'pointsThreshold': POINTS_THRESHOLD,
+    'pointsData':      points_data,
+    'paceData':        pace_data,
+    'detailData':      detail_data,
 }
 
 os.makedirs('data', exist_ok=True)
