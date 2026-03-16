@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-03-16 21:56 UTC",
+  "updatedAt": "2026-03-16 22:22 UTC",
   "season": "2025-26",
   "leagueAvgPoints": 230.0,
   "leagueAvgPace": 99.8,
@@ -455,51 +455,6 @@
       "over228": 27,
       "games": 67,
       "ptsScore": 215.2
-    },
-    {
-      "team": "World",
-      "avgPts": 82.5,
-      "homePts": null,
-      "awayPts": 82.5,
-      "l20Pts": null,
-      "l14Pts": null,
-      "l7Pts": null,
-      "adjL7Pts": null,
-      "l3Pts": null,
-      "adjL3Pts": null,
-      "over228": 0,
-      "games": 2,
-      "ptsScore": 37.1
-    },
-    {
-      "team": "Team Stripes",
-      "avgPts": 81.0,
-      "homePts": 81.0,
-      "awayPts": null,
-      "l20Pts": null,
-      "l14Pts": null,
-      "l7Pts": null,
-      "adjL7Pts": null,
-      "l3Pts": 81.0,
-      "adjL3Pts": 234.2,
-      "over228": 0,
-      "games": 3,
-      "ptsScore": 36.5
-    },
-    {
-      "team": "Team Stars",
-      "avgPts": 74.0,
-      "homePts": 72.0,
-      "awayPts": 75.0,
-      "l20Pts": null,
-      "l14Pts": null,
-      "l7Pts": null,
-      "adjL7Pts": null,
-      "l3Pts": 74.0,
-      "adjL3Pts": 222.5,
-      "over228": 0,
-      "games": 3,
-      "ptsScore": 33.3
     }
   ],
   "paceData": [
@@ -922,48 +877,6 @@
       "adjL3Pace": 93.3,
       "games": 67,
       "paceScore": 93.6
-    },
-    {
-      "team": "Team Stars",
-      "avgPace": 34.0,
-      "homePace": 34.5,
-      "awayPace": 33.8,
-      "l20Pace": null,
-      "l14Pace": null,
-      "l7Pace": null,
-      "adjL7Pace": null,
-      "l3Pace": 34.0,
-      "adjL3Pace": 100.9,
-      "games": 3,
-      "paceScore": 15.3
-    },
-    {
-      "team": "Team Stripes",
-      "avgPace": 32.9,
-      "homePace": 32.9,
-      "awayPace": null,
-      "l20Pace": null,
-      "l14Pace": null,
-      "l7Pace": null,
-      "adjL7Pace": null,
-      "l3Pace": 32.9,
-      "adjL3Pace": 99.1,
-      "games": 3,
-      "paceScore": 14.8
-    },
-    {
-      "team": "World",
-      "avgPace": 32.9,
-      "homePace": null,
-      "awayPace": 32.9,
-      "l20Pace": null,
-      "l14Pace": null,
-      "l7Pace": null,
-      "adjL7Pace": null,
-      "l3Pace": null,
-      "adjL3Pace": null,
-      "games": 2,
-      "paceScore": 14.8
     }
   ],
   "detailData": {
@@ -3289,82 +3202,6 @@
         "adjPace": 104.7
       }
     ],
-    "Team Stars": [
-      {
-        "date": "2026-02-16",
-        "matchup": "STARS @ STRIPES",
-        "wl": "W",
-        "pts": 47,
-        "total": 68.0,
-        "oppAvg": 81.0,
-        "adjTotal": 217.0,
-        "pace": 30.4,
-        "oppPace": 32.9,
-        "adjPace": 97.3
-      },
-      {
-        "date": "2026-02-15",
-        "matchup": "STARS vs. WORLD",
-        "wl": "W",
-        "pts": 37,
-        "total": 72.0,
-        "oppAvg": 82.5,
-        "adjTotal": 219.5,
-        "pace": 34.5,
-        "oppPace": 32.9,
-        "adjPace": 101.4
-      },
-      {
-        "date": "2026-02-15",
-        "matchup": "STARS @ STRIPES",
-        "wl": "L",
-        "pts": 40,
-        "total": 82.0,
-        "oppAvg": 81.0,
-        "adjTotal": 231.0,
-        "pace": 37.1,
-        "oppPace": 32.9,
-        "adjPace": 104.0
-      }
-    ],
-    "Team Stripes": [
-      {
-        "date": "2026-02-16",
-        "matchup": "STRIPES vs. STARS",
-        "wl": "L",
-        "pts": 21,
-        "total": 68.0,
-        "oppAvg": 74.0,
-        "adjTotal": 224.0,
-        "pace": 30.4,
-        "oppPace": 34.0,
-        "adjPace": 96.2
-      },
-      {
-        "date": "2026-02-15",
-        "matchup": "STRIPES vs. STARS",
-        "wl": "W",
-        "pts": 42,
-        "total": 82.0,
-        "oppAvg": 74.0,
-        "adjTotal": 238.0,
-        "pace": 37.1,
-        "oppPace": 34.0,
-        "adjPace": 102.9
-      },
-      {
-        "date": "2026-02-15",
-        "matchup": "STRIPES vs. WORLD",
-        "wl": "W",
-        "pts": 48,
-        "total": 93.0,
-        "oppAvg": 82.5,
-        "adjTotal": 240.5,
-        "pace": 31.2,
-        "oppPace": 32.9,
-        "adjPace": 98.1
-      }
-    ],
     "Toronto Raptors": [
       {
         "date": "2026-03-15",
@@ -3621,32 +3458,6 @@
         "pace": 99.9,
         "oppPace": 97.2,
         "adjPace": 102.5
-      }
-    ],
-    "World": [
-      {
-        "date": "2026-02-15",
-        "matchup": "WORLD @ STARS",
-        "wl": "L",
-        "pts": 35,
-        "total": 72.0,
-        "oppAvg": 74.0,
-        "adjTotal": 228.0,
-        "pace": 34.5,
-        "oppPace": 34.0,
-        "adjPace": 100.3
-      },
-      {
-        "date": "2026-02-15",
-        "matchup": "WORLD @ STRIPES",
-        "wl": "L",
-        "pts": 45,
-        "total": 93.0,
-        "oppAvg": 81.0,
-        "adjTotal": 242.0,
-        "pace": 31.2,
-        "oppPace": 32.9,
-        "adjPace": 98.1
       }
     ]
   }
