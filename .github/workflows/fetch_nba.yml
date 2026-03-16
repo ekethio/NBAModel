@@ -1,0 +1,37 @@
+name: Fetch NBA Stats
+
+on:
+  # Run automatically every day at 6am UTC
+  schedule:
+    - cron: '0 6 * * *'
+  # Also allow manual trigger from the GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install nba_api pandas
+
+      - name: Run NBA fetch script
+        run: python fetch_nba.py
+
+      - name: Commit and push data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/nba_stats.json
+          git diff --staged --quiet || git commit -m "Update NBA stats $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push
