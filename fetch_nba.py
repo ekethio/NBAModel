@@ -194,12 +194,25 @@ for g in all_game_stubs:
 for tid in team_game_rows:
     team_game_rows[tid].sort(key=lambda x: x['date'], reverse=True)
 
-# Active team list
+# Active team list — whitelist only the 30 real NBA franchises
+NBA_TEAMS = {
+    'Atlanta Hawks', 'Boston Celtics', 'Brooklyn Nets', 'Charlotte Hornets',
+    'Chicago Bulls', 'Cleveland Cavaliers', 'Dallas Mavericks', 'Denver Nuggets',
+    'Detroit Pistons', 'Golden State Warriors', 'Houston Rockets', 'Indiana Pacers',
+    'LA Clippers', 'Los Angeles Lakers', 'Memphis Grizzlies', 'Miami Heat',
+    'Milwaukee Bucks', 'Minnesota Timberwolves', 'New Orleans Pelicans', 'New York Knicks',
+    'Oklahoma City Thunder', 'Orlando Magic', 'Philadelphia 76ers', 'Phoenix Suns',
+    'Portland Trail Blazers', 'Sacramento Kings', 'San Antonio Spurs', 'Toronto Raptors',
+    'Utah Jazz', 'Washington Wizards',
+}
 team_set = {}
 for g in all_game_stubs:
-    team_set[g['home_id']] = g['home_name']
-    team_set[g['away_id']] = g['away_name']
+    if g['home_name'] in NBA_TEAMS:
+        team_set[g['home_id']] = g['home_name']
+    if g['away_name'] in NBA_TEAMS:
+        team_set[g['away_id']] = g['away_name']
 active_teams = [{'id': tid, 'name': name} for tid, name in sorted(team_set.items(), key=lambda x: x[1])]
+print(f"  {len(active_teams)} NBA teams found")
 
 # ── 4. League & team averages ─────────────────────────────────────────────────
 all_totals = list(game_totals.values())
