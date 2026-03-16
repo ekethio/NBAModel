@@ -1,8 +1,14 @@
 name: Fetch NBA Stats
 
 on:
+  # Run every day at 11pm Pacific (7am UTC next day)
   schedule:
-    - cron: '0 6 * * *'
+    - cron: '0 7 * * *'
+  # Run automatically whenever fetch_nba.py is updated
+  push:
+    paths:
+      - 'fetch_nba.py'
+  # Also allow manual trigger from the Actions tab
   workflow_dispatch:
 
 jobs:
