@@ -1,19 +1,47 @@
 from nba_api.stats.static import teams
 from nba_api.stats.endpoints import leaguegamelog
+from nba_api.library.http import NBAStatsHTTP
 import pandas as pd
 import json
 import os
+import time
 from datetime import datetime
 
 SEASON = '2024-25'
 SEASON_TYPE = 'Regular Season'
 POINTS_THRESHOLD = 228
 
+# ── Fix: inject browser-like headers so stats.nba.com doesn't block GitHub Actions ──
+NBAStatsHTTP.headers = {
+    'Host': 'stats.nba.com',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+    'Accept': 'application/json, text/plain, */*',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'x-nba-stats-origin': 'stats',
+    'x-nba-stats-token': 'true',
+    'Connection': 'keep-alive',
+    'Referer': 'https://www.nba.com/',
+    'Origin': 'https://www.nba.com',
+}
+
+def fetch_with_retry(fn, retries=5, delay=10):
+    """Call fn(), retrying on timeout up to `retries` times."""
+    for attempt in range(1, retries + 1):
+        try:
+            return fn()
+        except Exception as e:
+            if attempt == retries:
+                raise
+            print(f"Attempt {attempt} failed ({e}). Retrying in {delay}s...")
+            time.sleep(delay)
+
 print("Fetching game log...")
-gamelog = leaguegamelog.LeagueGameLog(
+gamelog = fetch_with_retry(lambda: leaguegamelog.LeagueGameLog(
     season=SEASON,
-    season_type_all_star=SEASON_TYPE
-)
+    season_type_all_star=SEASON_TYPE,
+    timeout=60,
+))
 all_games = gamelog.get_data_frames()[0]
 print(f"Got {len(all_games)} team-game rows")
 
