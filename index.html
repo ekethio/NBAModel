@@ -104,6 +104,71 @@
   .league-stat .val { font-size: 20px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; color: var(--gold); }
 
   #main { display: none; }
+
+  /* ── Splits ─────────────────────────────────────────────── */
+  .team-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .team-btn {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 8px 14px; border: 1px solid var(--border); background: var(--surface2);
+    color: var(--muted); cursor: pointer; transition: all 0.15s;
+  }
+  .team-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .team-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+
+  .splits-card { background: var(--surface); border: 1px solid var(--border); margin-bottom: 24px; }
+  .splits-card-header {
+    background: var(--surface2); padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+  }
+  .splits-card-header h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: 1px; color: var(--text); }
+  .splits-card-header .meta { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+
+  .splits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  @media(max-width:700px){ .splits-grid { grid-template-columns: 1fr; } }
+
+  .split-half { padding: 18px 20px; }
+  .split-half:first-child { border-right: 1px solid var(--border); }
+  .split-half-title {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
+  }
+
+  .splits-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.04); }
+  .splits-row:last-child { border-bottom: none; }
+  .splits-label { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .splits-values { display: flex; gap: 20px; }
+  .splits-val { text-align: right; }
+  .splits-val .sv-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 1px; }
+  .splits-val .sv-num { font-size: 15px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; color: var(--text); }
+  .splits-val .sv-margin { font-size: 12px; font-weight: 600; }
+
+  .pos { color: var(--green); }
+  .neg { color: var(--red); }
+  .neu { color: var(--muted); }
+
+  .special-flags { padding: 12px 20px; border-top: 1px solid var(--border); background: rgba(26,110,245,0.04); display: flex; flex-wrap: wrap; gap: 8px; }
+  .flag {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 2px;
+    background: rgba(26,110,245,0.1); border: 1px solid rgba(26,110,245,0.3); color: var(--accent);
+  }
+  .flag.home-flag { background: rgba(26,180,90,0.1); border-color: rgba(26,180,90,0.3); color: var(--green); }
+  .flag.road-flag { background: rgba(200,80,30,0.1); border-color: rgba(200,80,30,0.3); color: var(--accent2); }
+
+  .final-margin-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 20px; border-top: 2px solid var(--border);
+    font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1px;
+  }
+  .final-margin-row .fm-label { color: var(--muted); text-transform: uppercase; }
+  .final-margin-row .fm-vals { display: flex; gap: 28px; }
+  .final-margin-row .fm-item { text-align: right; }
+  .final-margin-row .fm-item span { display: block; font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+  .hr-diff { font-size: 13px; color: var(--muted); }
+  #splits-placeholder { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
 </style>
 </head>
 <body>
@@ -137,6 +202,7 @@
       <button class="view-tab active" onclick="switchTab('points',this)">Points Table</button>
       <button class="view-tab" onclick="switchTab('pace',this)">Pace Table</button>
       <button class="view-tab" onclick="switchTab('detail',this)">Team Detail</button>
+      <button class="view-tab" onclick="switchTab('splits',this)">Splits</button>
     </div>
 
     <div class="tab-panel active" id="tab-points">
@@ -187,6 +253,13 @@
         <select id="teamSelect" onchange="renderDetail()"><option value="">-- Choose a team --</option></select>
       </div>
       <div id="detail-output"></div>
+    </div>
+
+
+    <div class="tab-panel" id="tab-splits">
+      <div class="section-header"><h2>Team Splits</h2><div class="line"></div><div class="tag">2025-26 Season</div></div>
+      <div class="team-grid" id="splits-team-grid"></div>
+      <div id="splits-output"><div id="splits-placeholder">Select a team above to view splits</div></div>
     </div>
 
     <div class="league-footer" id="league-footer"></div>
@@ -377,6 +450,137 @@ function sortTable(tableId, colIdx, type) {
 }
 
 loadData();
+
+// ── SPLITS DATA (hardcoded 2025-26 season) ────────────────────────────────────
+const SPLITS = {
+  'Atlanta Hawks':           { abbr:'ATL', home:{gp:32, h1t:117.9,h1m:0.2,  h2t:115.7,h2m:-0.7, q1t:59.6,q1m:1.6,  q2t:58.3,q2m:-1.3, q3t:60.8,q3m:-0.5, q4t:54.9,q4m:-0.2, fin:-0.5},  road:{gp:33, h1t:121.3,h1m:0.0,  h2t:114.1,h2m:0.5,  q1t:60.8,q1m:-0.5, q2t:60.5,q2m:0.5,  q3t:56.7,q3m:-0.7, q4t:57.4,q4m:1.2,  fin:0.8},  hrDiff:-1.3, flags:['ROAD: H1-H2 Total Diff 7.2 (H1:121.3 H2:114.1)'] },
+  'Boston Celtics':          { abbr:'BOS', home:{gp:32, h1t:111.1,h1m:5.5,  h2t:110.9,h2m:1.4,  q1t:56.8,q1m:1.5,  q2t:54.3,q2m:4.0,  q3t:54.7,q3m:0.8,  q4t:56.2,q4m:0.5,  fin:6.9},  road:{gp:33, h1t:113.7,h1m:4.8,  h2t:105.5,h2m:3.2,  q1t:57.3,q1m:2.4,  q2t:56.4,q2m:2.4,  q3t:54.9,q3m:1.7,  q4t:50.6,q4m:1.5,  fin:8.1},  hrDiff:-1.2, flags:['HOME: H1-H2 Margin Diff 4.1','ROAD: H1-H2 Total Diff 8.2 (H1:113.7 H2:105.5)'] },
+  'Brooklyn Nets':           { abbr:'BKN', home:{gp:30, h1t:112.3,h1m:-1.3, h2t:111.0,h2m:-3.0, q1t:56.9,q1m:-0.7, q2t:55.4,q2m:-0.6, q3t:57.4,q3m:-2.3, q4t:53.6,q4m:-0.7, fin:-4.4}, road:{gp:34, h1t:114.9,h1m:-9.7, h2t:105.0,h2m:-2.7, q1t:57.4,q1m:-5.9, q2t:57.5,q2m:-3.9, q3t:53.7,q3m:-1.0, q4t:51.3,q4m:-1.7, fin:-12.4}, hrDiff:8.0,  flags:['ROAD: H1-H2 Margin Diff 7.0','ROAD: H1-H2 Total Diff 9.9 (H1:114.9 H2:105.0)'] },
+  'Charlotte Hornets':       { abbr:'CHA', home:{gp:32, h1t:116.3,h1m:1.8,  h2t:109.6,h2m:-0.2, q1t:60.0,q1m:0.4,  q2t:56.3,q2m:1.3,  q3t:56.3,q3m:0.3,  q4t:53.3,q4m:-0.5, fin:1.8},  road:{gp:34, h1t:113.7,h1m:3.5,  h2t:116.7,h2m:2.5,  q1t:61.3,q1m:0.6,  q2t:52.4,q2m:2.9,  q3t:62.3,q3m:3.6,  q4t:54.5,q4m:-1.1, fin:5.8},  hrDiff:-4.0, flags:['HOME: H1-H2 Total Diff 6.7 (H1:116.3 H2:109.6)'] },
+  'Chicago Bulls':           { abbr:'CHI', home:{gp:35, h1t:115.9,h1m:-0.9, h2t:116.1,h2m:-1.7, q1t:61.1,q1m:-0.4, q2t:54.8,q2m:-0.5, q3t:60.1,q3m:-1.5, q4t:56.0,q4m:-0.2, fin:-2.6}, road:{gp:30, h1t:117.1,h1m:-5.2, h2t:121.0,h2m:-0.6, q1t:58.0,q1m:-3.8, q2t:59.1,q2m:-1.4, q3t:62.6,q3m:-0.2, q4t:58.4,q4m:-0.4, fin:-5.9}, hrDiff:3.3,  flags:['ROAD: H1-H2 Margin Diff 4.6'] },
+  'Cleveland Cavaliers':     { abbr:'CLE', home:{gp:34, h1t:116.8,h1m:-1.1, h2t:114.2,h2m:6.1,  q1t:58.1,q1m:1.0,  q2t:58.6,q2m:-2.0, q3t:58.3,q3m:5.0,  q4t:55.9,q4m:1.1,  fin:4.8},  road:{gp:31, h1t:113.7,h1m:1.5,  h2t:120.8,h2m:2.3,  q1t:58.2,q1m:2.8,  q2t:55.5,q2m:-1.3, q3t:61.4,q3m:-0.9, q4t:59.5,q4m:3.1,  fin:3.6},  hrDiff:1.2,  flags:['HOME: H1-H2 Margin Diff 7.2','ROAD: H1-H2 Total Diff 7.1 (H1:113.7 H2:120.8)'] },
+  'Dallas Mavericks':        { abbr:'DAL', home:{gp:33, h1t:112.9,h1m:-2.5, h2t:115.9,h2m:0.4,  q1t:59.2,q1m:-1.7, q2t:53.8,q2m:-0.8, q3t:59.5,q3m:0.5,  q4t:56.3,q4m:-0.2, fin:-2.1}, road:{gp:31, h1t:120.3,h1m:-5.1, h2t:109.5,h2m:-0.4, q1t:60.4,q1m:-3.9, q2t:59.9,q2m:-1.2, q3t:56.6,q3m:-0.9, q4t:52.9,q4m:0.5,  fin:-5.7}, hrDiff:3.6,  flags:['ROAD: H1-H2 Margin Diff 4.7','ROAD: H1-H2 Total Diff 10.8 (H1:120.3 H2:109.5)'] },
+  'Denver Nuggets':          { abbr:'DEN', home:{gp:31, h1t:115.4,h1m:4.3,  h2t:115.3,h2m:-2.3, q1t:58.4,q1m:3.4,  q2t:57.0,q2m:0.9,  q3t:59.0,q3m:-0.1, q4t:56.3,q4m:-2.2, fin:2.3},  road:{gp:35, h1t:117.2,h1m:2.3,  h2t:118.0,h2m:3.1,  q1t:58.6,q1m:1.2,  q2t:58.6,q2m:1.1,  q3t:60.3,q3m:2.7,  q4t:57.7,q4m:0.3,  fin:4.9},  hrDiff:-2.6, flags:['HOME: H1-H2 Margin Diff 6.6'] },
+  'Detroit Pistons':         { abbr:'DET', home:{gp:33, h1t:112.6,h1m:6.1,  h2t:110.7,h2m:3.9,  q1t:55.9,q1m:1.1,  q2t:56.6,q2m:5.0,  q3t:54.7,q3m:0.8,  q4t:55.9,q4m:3.0,  fin:10.1}, road:{gp:31, h1t:117.9,h1m:2.5,  h2t:110.0,h2m:1.3,  q1t:59.5,q1m:0.8,  q2t:58.3,q2m:1.7,  q3t:57.1,q3m:2.3,  q4t:52.9,q4m:-1.1, fin:3.7},  hrDiff:6.4,  flags:['ROAD: H1-H2 Total Diff 7.9 (H1:117.9 H2:110.0)'] },
+  'Golden State Warriors':   { abbr:'GS',  home:{gp:33, h1t:117.5,h1m:0.4,  h2t:113.5,h2m:2.2,  q1t:60.5,q1m:-0.3, q2t:57.0,q2m:0.7,  q3t:59.4,q3m:0.5,  q4t:54.1,q4m:1.7,  fin:2.8},  road:{gp:32, h1t:108.5,h1m:-1.1, h2t:115.2,h2m:0.9,  q1t:53.5,q1m:-1.7, q2t:55.0,q2m:0.7,  q3t:57.8,q3m:0.3,  q4t:57.5,q4m:0.7,  fin:-0.5}, hrDiff:3.3,  flags:['ROAD: H1-H2 Total Diff 6.7 (H1:108.5 H2:115.2)'] },
+  'Houston Rockets':         { abbr:'HOU', home:{gp:29, h1t:112.3,h1m:3.6,  h2t:106.3,h2m:2.8,  q1t:55.9,q1m:1.1,  q2t:56.4,q2m:2.5,  q3t:53.6,q3m:2.4,  q4t:52.8,q4m:0.4,  fin:6.5},  road:{gp:35, h1t:109.7,h1m:2.2,  h2t:114.9,h2m:2.7,  q1t:55.0,q1m:2.3,  q2t:54.6,q2m:-0.1, q3t:57.0,q3m:3.6,  q4t:57.9,q4m:-1.0, fin:4.4},  hrDiff:2.1,  flags:['HOME: H1-H2 Total Diff 6.0 (H1:112.3 H2:106.3)','ROAD: H1-H2 Total Diff 5.2 (H1:109.7 H2:114.9)'] },
+  'Indiana Pacers':          { abbr:'IND', home:{gp:32, h1t:119.4,h1m:-3.6, h2t:112.0,h2m:-1.1, q1t:58.9,q1m:-0.1, q2t:60.4,q2m:-3.4, q3t:57.7,q3m:-0.9, q4t:54.3,q4m:-0.2, fin:-4.8}, road:{gp:32, h1t:112.7,h1m:-5.9, h2t:116.3,h2m:-6.9, q1t:57.1,q1m:-3.0, q2t:55.6,q2m:-2.9, q3t:61.3,q3m:-4.7, q4t:55.0,q4m:-2.2, fin:-12.7},hrDiff:7.9,  flags:['HOME: H1-H2 Total Diff 7.4 (H1:119.4 H2:112.0)'] },
+  'LA Clippers':             { abbr:'LAC', home:{gp:29, h1t:112.3,h1m:4.4,  h2t:112.3,h2m:-1.3, q1t:57.4,q1m:3.8,  q2t:54.9,q2m:0.7,  q3t:58.4,q3m:0.3,  q4t:53.9,q4m:-1.6, fin:3.2},  road:{gp:36, h1t:108.8,h1m:-1.1, h2t:113.6,h2m:-0.5, q1t:56.2,q1m:-2.1, q2t:52.6,q2m:0.9,  q3t:57.7,q3m:0.0,  q4t:55.9,q4m:-0.5, fin:-1.4}, hrDiff:4.6,  flags:['HOME: H1-H2 Margin Diff 5.7'] },
+  'Los Angeles Lakers':      { abbr:'LAL', home:{gp:34, h1t:120.4,h1m:0.3,  h2t:112.2,h2m:1.0,  q1t:61.9,q1m:0.8,  q2t:58.5,q2m:-0.5, q3t:58.0,q3m:0.2,  q4t:54.2,q4m:0.8,  fin:1.3},  road:{gp:33, h1t:116.3,h1m:-0.2, h2t:112.0,h2m:-0.6, q1t:59.4,q1m:-0.1, q2t:56.8,q2m:-0.1, q3t:58.4,q3m:-1.5, q4t:53.6,q4m:0.9,  fin:-0.8}, hrDiff:2.1,  flags:['HOME: H1-H2 Total Diff 8.2 (H1:120.4 H2:112.2)'] },
+  'Memphis Grizzlies':       { abbr:'MEM', home:{gp:31, h1t:118.5,h1m:1.0,  h2t:115.8,h2m:-1.5, q1t:59.3,q1m:0.3,  q2t:59.2,q2m:0.7,  q3t:59.5,q3m:-0.8, q4t:56.3,q4m:-0.7, fin:-0.6}, road:{gp:33, h1t:118.3,h1m:-1.8, h2t:115.2,h2m:-2.2, q1t:60.0,q1m:-0.4, q2t:58.3,q2m:-1.5, q3t:58.6,q3m:-1.1, q4t:56.5,q4m:-1.1, fin:-3.8}, hrDiff:3.2,  flags:[] },
+  'Miami Heat':              { abbr:'MIA', home:{gp:32, h1t:118.7,h1m:3.6,  h2t:119.8,h2m:1.4,  q1t:58.9,q1m:2.6,  q2t:59.8,q2m:1.0,  q3t:59.8,q3m:0.3,  q4t:60.0,q4m:1.1,  fin:5.0},  road:{gp:33, h1t:121.7,h1m:2.9,  h2t:113.6,h2m:-1.5, q1t:62.2,q1m:2.9,  q2t:59.5,q2m:0.0,  q3t:59.2,q3m:-1.6, q4t:54.4,q4m:0.1,  fin:1.4},  hrDiff:3.6,  flags:['ROAD: H1-H2 Margin Diff 4.4','ROAD: H1-H2 Total Diff 8.1 (H1:121.7 H2:113.6)'] },
+  'Milwaukee Bucks':         { abbr:'MIL', home:{gp:32, h1t:118.2,h1m:-4.3, h2t:110.8,h2m:1.0,  q1t:57.9,q1m:-1.7, q2t:60.3,q2m:-2.6, q3t:56.4,q3m:0.4,  q4t:54.5,q4m:0.6,  fin:-3.1}, road:{gp:31, h1t:113.0,h1m:-1.1, h2t:109.5,h2m:-4.2, q1t:56.1,q1m:-0.2, q2t:56.9,q2m:-0.9, q3t:55.6,q3m:-2.7, q4t:53.8,q4m:-1.4, fin:-5.3}, hrDiff:2.2,  flags:['HOME: H1-H2 Margin Diff 5.3','HOME: H1-H2 Total Diff 7.4 (H1:118.2 H2:110.8)','ROAD: H1-H2 Margin Diff 3.1'] },
+  'Minnesota Timberwolves':  { abbr:'MIN', home:{gp:34, h1t:114.7,h1m:2.6,  h2t:110.9,h2m:1.4,  q1t:58.1,q1m:0.5,  q2t:56.6,q2m:2.1,  q3t:56.4,q3m:0.3,  q4t:54.4,q4m:1.0,  fin:4.0},  road:{gp:32, h1t:114.4,h1m:-0.2, h2t:123.7,h2m:3.6,  q1t:57.5,q1m:0.9,  q2t:56.9,q2m:-1.1, q3t:62.1,q3m:2.0,  q4t:61.6,q4m:1.6,  fin:3.4},  hrDiff:0.6,  flags:['ROAD: H1-H2 Margin Diff 3.8','ROAD: H1-H2 Total Diff 9.3 (H1:114.4 H2:123.7)'] },
+  'New Orleans Pelicans':    { abbr:'NO',  home:{gp:33, h1t:118.8,h1m:-2.0, h2t:116.9,h2m:-0.9, q1t:61.2,q1m:-0.9, q2t:57.6,q2m:-1.1, q3t:59.0,q3m:-0.1, q4t:57.9,q4m:-0.8, fin:-3.2}, road:{gp:34, h1t:117.5,h1m:-2.8, h2t:115.4,h2m:-3.9, q1t:58.1,q1m:-2.6, q2t:59.4,q2m:-0.2, q3t:57.6,q3m:-2.7, q4t:57.8,q4m:-1.1, fin:-6.8}, hrDiff:3.6,  flags:[] },
+  'New York Knicks':         { abbr:'NY',  home:{gp:34, h1t:114.0,h1m:2.7,  h2t:112.1,h2m:6.1,  q1t:57.6,q1m:2.8,  q2t:56.4,q2m:-0.1, q3t:59.3,q3m:2.2,  q4t:52.9,q4m:3.9,  fin:8.9},  road:{gp:33, h1t:117.5,h1m:2.7,  h2t:109.5,h2m:1.1,  q1t:59.3,q1m:-0.5, q2t:58.3,q2m:3.2,  q3t:55.6,q3m:-1.0, q4t:53.8,q4m:2.0,  fin:3.8},  hrDiff:5.1,  flags:['HOME: H1-H2 Margin Diff 3.4','ROAD: H1-H2 Total Diff 8.0 (H1:117.5 H2:109.5)'] },
+  'Oklahoma City Thunder':   { abbr:'OKC', home:{gp:34, h1t:112.1,h1m:6.1,  h2t:108.5,h2m:5.0,  q1t:56.4,q1m:3.8,  q2t:55.8,q2m:2.3,  q3t:56.2,q3m:2.9,  q4t:52.3,q4m:2.1,  fin:11.4}, road:{gp:33, h1t:113.8,h1m:5.6,  h2t:112.4,h2m:4.4,  q1t:57.9,q1m:3.5,  q2t:55.9,q2m:2.2,  q3t:58.4,q3m:2.5,  q4t:54.0,q4m:1.9,  fin:10.2}, hrDiff:1.2,  flags:[] },
+  'Orlando Magic':           { abbr:'ORL', home:{gp:33, h1t:112.6,h1m:-0.5, h2t:116.8,h2m:2.4,  q1t:56.8,q1m:0.1,  q2t:55.7,q2m:-0.5, q3t:58.7,q3m:0.5,  q4t:58.1,q4m:1.9,  fin:1.9},  road:{gp:30, h1t:117.9,h1m:0.5,  h2t:108.1,h2m:-0.4, q1t:57.6,q1m:-0.7, q2t:60.3,q2m:1.1,  q3t:57.6,q3m:0.3,  q4t:50.5,q4m:-0.7, fin:-0.1}, hrDiff:2.0,  flags:['ROAD: H1-H2 Total Diff 9.8 (H1:117.9 H2:108.1)'] },
+  'Philadelphia 76ers':      { abbr:'PHI', home:{gp:34, h1t:118.1,h1m:1.0,  h2t:111.5,h2m:-2.8, q1t:60.9,q1m:-0.3, q2t:57.3,q2m:1.3,  q3t:58.0,q3m:-4.9, q4t:53.5,q4m:2.1,  fin:-1.8}, road:{gp:30, h1t:121.0,h1m:4.4,  h2t:108.3,h2m:-2.9, q1t:59.9,q1m:2.0,  q2t:61.1,q2m:2.4,  q3t:55.6,q3m:-3.4, q4t:52.7,q4m:0.5,  fin:2.0},  hrDiff:-3.8, flags:['HOME: H1-H2 Margin Diff 3.8','HOME: H1-H2 Total Diff 6.6 (H1:118.1 H2:111.5)','ROAD: H1-H2 Margin Diff 7.3','ROAD: H1-H2 Total Diff 12.7 (H1:121.0 H2:108.3)'] },
+  'Phoenix Suns':            { abbr:'PHX', home:{gp:35, h1t:109.5,h1m:1.0,  h2t:109.0,h2m:2.1,  q1t:52.9,q1m:0.4,  q2t:56.6,q2m:0.6,  q3t:55.6,q3m:3.2,  q4t:53.4,q4m:-1.1, fin:3.2},  road:{gp:29, h1t:119.0,h1m:-0.4, h2t:107.9,h2m:-1.0, q1t:58.5,q1m:-0.2, q2t:60.5,q2m:-0.2, q3t:55.1,q3m:0.0,  q4t:52.8,q4m:-1.0, fin:-1.6}, hrDiff:4.8,  flags:['ROAD: H1-H2 Total Diff 11.1 (H1:119.0 H2:107.9)'] },
+  'Portland Trail Blazers':  { abbr:'POR', home:{gp:32, h1t:119.7,h1m:-0.4, h2t:115.6,h2m:-0.5, q1t:59.2,q1m:0.2,  q2t:60.5,q2m:-0.7, q3t:59.9,q3m:-1.4, q4t:55.7,q4m:0.9,  fin:-0.9}, road:{gp:34, h1t:117.5,h1m:-3.3, h2t:112.3,h2m:-1.6, q1t:60.3,q1m:-3.9, q2t:57.2,q2m:0.6,  q3t:55.6,q3m:1.6,  q4t:56.7,q4m:-3.2, fin:-5.1}, hrDiff:4.2,  flags:['ROAD: H1-H2 Total Diff 5.2 (H1:117.5 H2:112.3)'] },
+  'Sacramento Kings':        { abbr:'SAC', home:{gp:32, h1t:114.5,h1m:-5.0, h2t:113.7,h2m:-3.5, q1t:57.0,q1m:0.4,  q2t:57.5,q2m:-5.4, q3t:58.5,q3m:-1.5, q4t:55.2,q4m:-2.0, fin:-8.3}, road:{gp:34, h1t:120.5,h1m:-6.8, h2t:110.9,h2m:-6.4, q1t:60.5,q1m:-4.3, q2t:60.0,q2m:-2.5, q3t:57.0,q3m:-2.9, q4t:53.9,q4m:-3.5, fin:-13.3},hrDiff:5.0,  flags:['ROAD: H1-H2 Total Diff 9.6 (H1:120.5 H2:110.9)'] },
+  'San Antonio Spurs':       { abbr:'SA',  home:{gp:30, h1t:117.2,h1m:5.1,  h2t:113.2,h2m:3.9,  q1t:58.4,q1m:4.3,  q2t:58.8,q2m:0.8,  q3t:57.3,q3m:1.6,  q4t:55.9,q4m:2.2,  fin:8.9},  road:{gp:35, h1t:118.2,h1m:5.0,  h2t:110.4,h2m:0.0,  q1t:59.8,q1m:2.8,  q2t:58.4,q2m:2.3,  q3t:57.9,q3m:-0.4, q4t:52.5,q4m:0.4,  fin:5.1},  hrDiff:3.8,  flags:['ROAD: H1-H2 Margin Diff 5.0','ROAD: H1-H2 Total Diff 7.8 (H1:118.2 H2:110.4)'] },
+  'Toronto Raptors':         { abbr:'TOR', home:{gp:33, h1t:116.3,h1m:-0.3, h2t:107.4,h2m:0.2,  q1t:57.0,q1m:0.2,  q2t:59.3,q2m:-0.5, q3t:57.6,q3m:1.5,  q4t:49.8,q4m:-1.3, fin:0.3},  road:{gp:31, h1t:110.5,h1m:1.1,  h2t:114.5,h2m:1.9,  q1t:56.4,q1m:0.8,  q2t:54.1,q2m:0.4,  q3t:60.0,q3m:1.7,  q4t:54.5,q4m:0.2,  fin:2.8},  hrDiff:-2.5, flags:['HOME: H1-H2 Total Diff 8.9 (H1:116.3 H2:107.4)'] },
+  'Utah Jazz':               { abbr:'UTAH',home:{gp:33, h1t:124.9,h1m:-3.3, h2t:121.1,h2m:-3.3, q1t:64.5,q1m:0.5,  q2t:60.5,q2m:-3.8, q3t:61.6,q3m:-2.5, q4t:59.5,q4m:-0.8, fin:-6.2}, road:{gp:32, h1t:115.1,h1m:-5.9, h2t:120.2,h2m:-2.8, q1t:57.9,q1m:-6.2, q2t:57.2,q2m:0.3,  q3t:62.6,q3m:-2.2, q4t:57.7,q4m:-0.5, fin:-8.8}, hrDiff:2.6,  flags:['ROAD: H1-H2 Margin Diff 3.1','ROAD: H1-H2 Total Diff 5.1 (H1:115.1 H2:120.2)'] },
+  'Washington Wizards':      { abbr:'WSH', home:{gp:33, h1t:118.5,h1m:-4.3, h2t:118.0,h2m:-4.5, q1t:58.6,q1m:-1.5, q2t:59.9,q2m:-2.7, q3t:61.6,q3m:-1.1, q4t:56.4,q4m:-3.4, fin:-8.9}, road:{gp:30, h1t:119.5,h1m:-8.9, h2t:112.4,h2m:-4.3, q1t:60.8,q1m:-5.9, q2t:58.7,q2m:-3.0, q3t:57.7,q3m:-1.9, q4t:54.7,q4m:-2.3, fin:-13.2},hrDiff:4.3,  flags:['ROAD: H1-H2 Margin Diff 4.6','ROAD: H1-H2 Total Diff 7.1 (H1:119.5 H2:112.4)'] },
+};
+
+function buildSplitsGrid() {
+  const grid = document.getElementById('splits-team-grid');
+  if (!grid) return;
+  Object.keys(SPLITS).sort().forEach(name => {
+    const d = SPLITS[name];
+    const btn = document.createElement('button');
+    btn.className = 'team-btn';
+    btn.textContent = d.abbr;
+    btn.title = name;
+    btn.onclick = () => showSplits(name, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function fmtM(v) {
+  const s = v >= 0 ? `+${v.toFixed(1)}` : v.toFixed(1);
+  const cls = v > 0 ? 'pos' : v < 0 ? 'neg' : 'neu';
+  return `<span class="${cls} sv-margin">${s}</span>`;
+}
+
+function halfRow(label, tot, margin) {
+  return `<div class="splits-row">
+    <span class="splits-label">${label}</span>
+    <div class="splits-values">
+      <div class="splits-val"><span class="sv-label">Total</span><span class="sv-num">${tot.toFixed(1)}</span></div>
+      <div class="splits-val"><span class="sv-label">Margin</span>${fmtM(margin)}</div>
+    </div>
+  </div>`;
+}
+
+function qRow(label, tot, margin) {
+  return `<div class="splits-row">
+    <span class="splits-label">${label}</span>
+    <div class="splits-values">
+      <div class="splits-val"><span class="sv-label">Total</span><span class="sv-num">${tot.toFixed(1)}</span></div>
+      <div class="splits-val"><span class="sv-label">Margin</span>${fmtM(margin)}</div>
+    </div>
+  </div>`;
+}
+
+function showSplits(name, btn) {
+  document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const d = SPLITS[name];
+  const h = d.home, r = d.road;
+  const hrCls = d.hrDiff > 0 ? 'pos' : d.hrDiff < 0 ? 'neg' : 'neu';
+
+  const flags = d.flags.length ? `
+    <div class="special-flags">
+      ${d.flags.map(f => {
+        const cls = f.startsWith('HOME') ? 'home-flag' : 'road-flag';
+        return `<span class="flag ${cls}">⚑ ${f}</span>`;
+      }).join('')}
+    </div>` : '';
+
+  document.getElementById('splits-output').innerHTML = `
+    <div class="splits-card">
+      <div class="splits-card-header">
+        <h3>${name}</h3>
+        <div class="meta">2025-26 · ${h.gp} Home / ${r.gp} Road games · As of Mar 8 2026</div>
+      </div>
+      <div class="splits-grid">
+        <div class="split-half">
+          <div class="split-half-title">🏠 Home · ${h.gp} GP</div>
+          ${halfRow('H1', h.h1t, h.h1m)}
+          ${halfRow('H2', h.h2t, h.h2m)}
+          ${qRow('Q1', h.q1t, h.q1m)}
+          ${qRow('Q2', h.q2t, h.q2m)}
+          ${qRow('Q3', h.q3t, h.q3m)}
+          ${qRow('Q4', h.q4t, h.q4m)}
+        </div>
+        <div class="split-half">
+          <div class="split-half-title">✈️ Road · ${r.gp} GP</div>
+          ${halfRow('H1', r.h1t, r.h1m)}
+          ${halfRow('H2', r.h2t, r.h2m)}
+          ${qRow('Q1', r.q1t, r.q1m)}
+          ${qRow('Q2', r.q2t, r.q2m)}
+          ${qRow('Q3', r.q3t, r.q3m)}
+          ${qRow('Q4', r.q4t, r.q4m)}
+        </div>
+      </div>
+      <div class="final-margin-row">
+        <span class="fm-label">Final Margin</span>
+        <div class="fm-vals">
+          <div class="fm-item"><span>Home</span>${fmtM(h.fin)}</div>
+          <div class="fm-item"><span>Road</span>${fmtM(r.fin)}</div>
+          <div class="fm-item"><span>H/R Diff</span><span class="${hrCls} hr-diff">${d.hrDiff >= 0 ? '+' : ''}${d.hrDiff.toFixed(1)}</span></div>
+        </div>
+      </div>
+      ${flags}
+    </div>`;
+}
+
+buildSplitsGrid();
+
 </script>
 </body>
 </html>
