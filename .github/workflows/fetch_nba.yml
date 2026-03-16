@@ -1,10 +1,8 @@
 name: Fetch NBA Stats
 
 on:
-  # Run automatically every day at 6am UTC
   schedule:
     - cron: '0 6 * * *'
-  # Also allow manual trigger from the GitHub Actions tab
   workflow_dispatch:
 
 jobs:
@@ -23,7 +21,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install nba_api pandas
+        run: pip install requests
 
       - name: Run NBA fetch script
         run: python fetch_nba.py
