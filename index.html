@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NBA Team Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #060a0f; --surface: #0d1520; --surface2: #111d2e;
+    --border: #1e3050; --accent: #00d4ff; --accent2: #ff6b2b;
+    --text: #e8f4ff; --muted: #5a7a99;
+    --green: #00e676; --red: #ff4444; --gold: #ffd740;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Mono', monospace; min-height: 100vh; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  }
+  .wrapper { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 20px 60px; }
+
+  header { padding: 36px 0 24px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+  .header-inner { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+  .eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 4px; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+  h1 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(28px,5vw,52px); font-weight: 900; line-height: 1; letter-spacing: -1px; }
+  h1 span { color: var(--accent); }
+
+  .top-bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 24px; }
+  .updated-pill { font-size: 11px; color: var(--muted); padding: 6px 14px; border: 1px solid var(--border); background: var(--surface); }
+  .updated-pill span { color: var(--accent); }
+
+  .btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; padding: 10px 22px; border: 1px solid; cursor: pointer; transition: all 0.15s; background: transparent; }
+  .btn-primary { border-color: var(--accent); color: var(--accent); }
+  .btn-primary:hover { background: var(--accent); color: var(--bg); }
+
+  /* Info box */
+  .info-box { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 16px 20px; margin-bottom: 24px; font-size: 11px; color: var(--muted); line-height: 1.9; }
+  .info-box strong { color: var(--text); }
+
+  /* Status bar */
+  .status-bar { display: flex; gap: 24px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 24px; font-size: 11px; flex-wrap: wrap; }
+  .stat-pill { display: flex; gap: 8px; align-items: center; }
+  .stat-pill .label { color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .stat-pill .val { color: var(--accent); font-weight: 500; }
+
+  /* Loading / error */
+  #loading { text-align: center; padding: 80px 20px; }
+  .spinner { width: 48px; height: 48px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 20px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 12px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+  #error-msg { display: none; padding: 16px 20px; border: 1px solid var(--red); background: rgba(255,68,68,0.05); color: var(--red); font-size: 12px; margin-bottom: 20px; line-height: 1.8; }
+
+  /* Tabs */
+  .tabs-row { display: flex; border-bottom: 1px solid var(--border); }
+  .view-tab { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 24px; border: none; background: transparent; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+  .view-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .view-tab:hover:not(.active) { color: var(--text); }
+  .tab-panel { display: none; padding-top: 24px; }
+  .tab-panel.active { display: block; }
+
+  /* Section headers */
+  .section-header { display: flex; align-items: center; gap: 16px; margin: 0 0 16px; }
+  .section-header h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+  .section-header .line { flex: 1; height: 1px; background: var(--border); }
+  .section-header .tag { font-size: 10px; letter-spacing: 2px; color: var(--accent2); border: 1px solid var(--accent2); padding: 2px 8px; text-transform: uppercase; }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin-bottom: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 800px; }
+  thead tr { border-bottom: 2px solid var(--accent); }
+  th { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 10px 12px; text-align: right; white-space: nowrap; cursor: pointer; user-select: none; }
+  th:first-child, th:nth-child(2) { text-align: left; }
+  th:hover { color: var(--accent); }
+  th.sort-asc::after { content: ' ↑'; color: var(--accent); }
+  th.sort-desc::after { content: ' ↓'; color: var(--accent); }
+  tbody tr { border-bottom: 1px solid rgba(30,48,80,0.5); transition: background 0.1s; }
+  tbody tr:hover { background: rgba(0,212,255,0.04); }
+  tbody tr.avg-row { border-top: 2px solid var(--border); background: var(--surface); color: var(--muted); }
+  td { padding: 9px 12px; text-align: right; }
+  td:first-child { text-align: left; color: var(--muted); font-size: 10px; width: 30px; }
+  td:nth-child(2) { text-align: left; font-weight: 500; color: var(--text); }
+  .hot { color: var(--green); } .warm { color: var(--gold); }
+  .cool { color: var(--accent); } .cold { color: var(--red); }
+
+  /* Detail */
+  .detail-section { background: var(--surface); border: 1px solid var(--border); margin-bottom: 24px; }
+  .detail-header { background: var(--surface2); padding: 14px 20px; border-bottom: 1px solid var(--border); }
+  .detail-header h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 1px; color: var(--accent); }
+  .detail-header .sub { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-top: 2px; }
+  .detail-table { overflow-x: auto; }
+  .detail-table table { min-width: 900px; }
+  .detail-table th { font-size: 10px; padding: 8px 10px; }
+  .detail-table td { font-size: 11px; padding: 8px 10px; }
+  .detail-table tbody tr.summary-row { background: rgba(0,212,255,0.06); border-top: 1px solid var(--accent); font-weight: 500; color: var(--accent); }
+
+  .detail-picker { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .detail-picker label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; }
+  .detail-picker select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; cursor: pointer; min-width: 220px; }
+
+  .league-footer { display: flex; gap: 32px; padding: 16px 0; margin-top: 8px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+  .league-stat .lbl { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+  .league-stat .val { font-size: 20px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; color: var(--gold); }
+
+  #main { display: none; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <header>
+    <div class="header-inner">
+      <div>
+        <div class="eyebrow">Automated Analytics Dashboard</div>
+        <h1>NBA Team <span>Analytics</span></h1>
+      </div>
+    </div>
+  </header>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading Stats Data...</div>
+  </div>
+
+  <div id="error-msg"></div>
+
+  <div id="main">
+    <div class="info-box">
+      <strong>How this works:</strong> Data is fetched automatically every day via GitHub Actions running your Python script.
+      To refresh manually, go to your repo → <strong>Actions tab</strong> → <strong>Fetch NBA Stats</strong> → <strong>Run workflow</strong>.
+      Last updated: <span id="updated-time" style="color:var(--accent)">—</span>
+    </div>
+
+    <div class="status-bar" id="status-bar"></div>
+
+    <div class="tabs-row">
+      <button class="view-tab active" onclick="switchTab('points',this)">Points Table</button>
+      <button class="view-tab" onclick="switchTab('pace',this)">Pace Table</button>
+      <button class="view-tab" onclick="switchTab('detail',this)">Team Detail</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-points">
+      <div class="section-header"><h2>Team Points Rankings</h2><div class="line"></div><div class="tag">Click column to sort</div></div>
+      <div class="table-wrap"><table id="points-table">
+        <thead><tr>
+          <th>#</th>
+          <th onclick="sortTable('points-table',1,'text')">Team</th>
+          <th onclick="sortTable('points-table',2,'num')">Avg Pts</th>
+          <th onclick="sortTable('points-table',3,'num')">L20</th>
+          <th onclick="sortTable('points-table',4,'num')">L14</th>
+          <th onclick="sortTable('points-table',5,'num')">L7</th>
+          <th onclick="sortTable('points-table',6,'num')">Adj L7</th>
+          <th onclick="sortTable('points-table',7,'num')">L3</th>
+          <th onclick="sortTable('points-table',8,'num')">Adj L3</th>
+          <th onclick="sortTable('points-table',9,'num')">Pts Score</th>
+          <th onclick="sortTable('points-table',10,'num')">O/228</th>
+          <th onclick="sortTable('points-table',11,'num')">GP</th>
+        </tr></thead>
+        <tbody id="points-body"></tbody>
+      </table></div>
+    </div>
+
+    <div class="tab-panel" id="tab-pace">
+      <div class="section-header"><h2>Team Pace Rankings</h2><div class="line"></div><div class="tag">Click column to sort</div></div>
+      <div class="table-wrap"><table id="pace-table">
+        <thead><tr>
+          <th>#</th>
+          <th onclick="sortTable('pace-table',1,'text')">Team</th>
+          <th onclick="sortTable('pace-table',2,'num')">Avg Pace</th>
+          <th onclick="sortTable('pace-table',3,'num')">L20</th>
+          <th onclick="sortTable('pace-table',4,'num')">L14</th>
+          <th onclick="sortTable('pace-table',5,'num')">L7</th>
+          <th onclick="sortTable('pace-table',6,'num')">Adj L7</th>
+          <th onclick="sortTable('pace-table',7,'num')">L3</th>
+          <th onclick="sortTable('pace-table',8,'num')">Adj L3</th>
+          <th onclick="sortTable('pace-table',9,'num')">Pace Score</th>
+          <th onclick="sortTable('pace-table',10,'num')">GP</th>
+        </tr></thead>
+        <tbody id="pace-body"></tbody>
+      </table></div>
+    </div>
+
+    <div class="tab-panel" id="tab-detail">
+      <div class="section-header"><h2>Last 7 Games Detail</h2><div class="line"></div></div>
+      <div class="detail-picker">
+        <label>Select Team:</label>
+        <select id="teamSelect" onchange="renderDetail()"><option value="">-- Choose a team --</option></select>
+      </div>
+      <div id="detail-output"></div>
+    </div>
+
+    <div class="league-footer" id="league-footer"></div>
+  </div>
+</div>
+
+<script>
+let statsData = null;
+let sortState = {};
+const THRESHOLD = 228;
+
+async function loadData() {
+  try {
+    // Cache-bust so we always get the latest JSON
+    const res = await fetch(`data/nba_stats.json?t=${Date.now()}`);
+    if (!res.ok) throw new Error(`Could not load data/nba_stats.json (${res.status}). Have you run the GitHub Action yet?`);
+    statsData = await res.json();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('main').style.display = 'block';
+    renderAll();
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    const err = document.getElementById('error-msg');
+    err.innerHTML = `⚠ ${e.message}<br><br>
+      <strong>To generate the data file:</strong><br>
+      1. Push all three files to your GitHub repo<br>
+      2. Go to your repo → Actions tab → "Fetch NBA Stats" → Run workflow<br>
+      3. Wait ~2 minutes, then refresh this page`;
+    err.style.display = 'block';
+  }
+}
+
+function fmt(v) {
+  if (v === null || v === undefined || isNaN(v)) return '<span style="color:var(--muted)">—</span>';
+  return Number(v).toFixed(1);
+}
+function heat(v, avg, span) {
+  if (v === null || isNaN(v)) return '';
+  const d = v - avg;
+  if (d > span*0.6) return 'hot'; if (d > span*0.15) return 'warm';
+  if (d < -span*0.6) return 'cold'; if (d < -span*0.15) return 'cool';
+  return '';
+}
+function colAvg(data, f) {
+  const v = data.map(r=>r[f]).filter(v=>v!==null&&v!==undefined&&!isNaN(v));
+  return v.length ? v.reduce((a,b)=>a+b,0)/v.length : 0;
+}
+
+function renderAll() {
+  const d = statsData;
+  document.getElementById('updated-time').textContent = d.updatedAt;
+  document.getElementById('status-bar').innerHTML = `
+    <div class="stat-pill"><span class="label">Teams</span><span class="val">${d.pointsData.length}</span></div>
+    <div class="stat-pill"><span class="label">Season</span><span class="val">${d.season}</span></div>
+    <div class="stat-pill"><span class="label">O/U Line</span><span class="val">${d.pointsThreshold}</span></div>
+    <div class="stat-pill"><span class="label">Updated</span><span class="val">${d.updatedAt}</span></div>`;
+
+  document.getElementById('league-footer').innerHTML = `
+    <div class="league-stat"><div class="lbl">League Avg Total Pts</div><div class="val">${d.leagueAvgPoints}</div></div>
+    <div class="league-stat"><div class="lbl">League Avg Pace</div><div class="val">${d.leagueAvgPace}</div></div>`;
+
+  renderPointsTable();
+  renderPaceTable();
+  renderTeamSelect();
+}
+
+function renderPointsTable() {
+  const data = statsData.pointsData;
+  const avg = statsData.leagueAvgPoints;
+  document.getElementById('points-body').innerHTML =
+    data.map((r,i) => `<tr>
+      <td>${i+1}</td><td>${r.team}</td>
+      <td class="${heat(r.avgPts,avg,20)}">${fmt(r.avgPts)}</td>
+      <td class="${heat(r.l20Pts,avg,20)}">${fmt(r.l20Pts)}</td>
+      <td class="${heat(r.l14Pts,avg,20)}">${fmt(r.l14Pts)}</td>
+      <td class="${heat(r.l7Pts,avg,20)}">${fmt(r.l7Pts)}</td>
+      <td class="${heat(r.adjL7Pts,avg,20)}">${fmt(r.adjL7Pts)}</td>
+      <td class="${heat(r.l3Pts,avg,20)}">${fmt(r.l3Pts)}</td>
+      <td class="${heat(r.adjL3Pts,avg,20)}">${fmt(r.adjL3Pts)}</td>
+      <td style="color:var(--gold);font-weight:500">${fmt(r.ptsScore)}</td>
+      <td>${r.over228}</td><td style="color:var(--muted)">${r.games}</td></tr>`).join('') +
+    `<tr class="avg-row"><td></td><td>League Average</td>
+      <td>${fmt(colAvg(data,'avgPts'))}</td><td>${fmt(colAvg(data,'l20Pts'))}</td><td>${fmt(colAvg(data,'l14Pts'))}</td>
+      <td>${fmt(colAvg(data,'l7Pts'))}</td><td>${fmt(colAvg(data,'adjL7Pts'))}</td>
+      <td>${fmt(colAvg(data,'l3Pts'))}</td><td>${fmt(colAvg(data,'adjL3Pts'))}</td>
+      <td>${fmt(colAvg(data,'ptsScore'))}</td>
+      <td>${Math.round(colAvg(data,'over228'))}</td><td>${Math.round(colAvg(data,'games'))}</td></tr>`;
+}
+
+function renderPaceTable() {
+  const data = statsData.paceData;
+  const avg = statsData.leagueAvgPace;
+  document.getElementById('pace-body').innerHTML =
+    data.map((r,i) => `<tr>
+      <td>${i+1}</td><td>${r.team}</td>
+      <td class="${heat(r.avgPace,avg,6)}">${fmt(r.avgPace)}</td>
+      <td class="${heat(r.l20Pace,avg,6)}">${fmt(r.l20Pace)}</td>
+      <td class="${heat(r.l14Pace,avg,6)}">${fmt(r.l14Pace)}</td>
+      <td class="${heat(r.l7Pace,avg,6)}">${fmt(r.l7Pace)}</td>
+      <td class="${heat(r.adjL7Pace,avg,6)}">${fmt(r.adjL7Pace)}</td>
+      <td class="${heat(r.l3Pace,avg,6)}">${fmt(r.l3Pace)}</td>
+      <td class="${heat(r.adjL3Pace,avg,6)}">${fmt(r.adjL3Pace)}</td>
+      <td style="color:var(--gold);font-weight:500">${fmt(r.paceScore)}</td>
+      <td style="color:var(--muted)">${r.games}</td></tr>`).join('') +
+    `<tr class="avg-row"><td></td><td>League Average</td>
+      <td>${fmt(colAvg(data,'avgPace'))}</td><td>${fmt(colAvg(data,'l20Pace'))}</td><td>${fmt(colAvg(data,'l14Pace'))}</td>
+      <td>${fmt(colAvg(data,'l7Pace'))}</td><td>${fmt(colAvg(data,'adjL7Pace'))}</td>
+      <td>${fmt(colAvg(data,'l3Pace'))}</td><td>${fmt(colAvg(data,'adjL3Pace'))}</td>
+      <td>${fmt(colAvg(data,'paceScore'))}</td><td>${Math.round(colAvg(data,'games'))}</td></tr>`;
+}
+
+function renderTeamSelect() {
+  const teams = Object.keys(statsData.detailData).sort();
+  document.getElementById('teamSelect').innerHTML =
+    '<option value="">-- Choose a team --</option>' +
+    teams.map(t => `<option value="${t}">${t}</option>`).join('');
+}
+
+function renderDetail() {
+  const teamName = document.getElementById('teamSelect').value;
+  if (!teamName) { document.getElementById('detail-output').innerHTML = ''; return; }
+  const rows = statsData.detailData[teamName] || [];
+  const threshold = statsData.pointsThreshold;
+  const lgPts  = statsData.leagueAvgPoints;
+  const lgPace = statsData.leagueAvgPace;
+
+  let adjTotals = rows.map(r => r.adjTotal);
+  let adjPaces  = rows.map(r => r.adjPace);
+  let rawTotals = rows.map(r => r.total);
+  let rawPaces  = rows.map(r => r.pace);
+  const avg = arr => arr.reduce((a,b)=>a+b,0)/arr.length;
+
+  const tableRows = rows.map(r => {
+    const wlC = r.wl==='W' ? 'var(--green)' : 'var(--red)';
+    const totC = r.total >= threshold ? 'var(--green)' : 'var(--red)';
+    return `<tr>
+      <td>${r.date}</td><td style="text-align:left">${r.matchup}</td>
+      <td style="color:${wlC};font-weight:600">${r.wl}</td><td>${r.pts}</td>
+      <td style="color:${totC}">${fmt(r.total)}</td>
+      <td style="color:var(--muted)">${fmt(r.oppAvg)}</td><td>${fmt(r.adjTotal)}</td>
+      <td>${fmt(r.pace)}</td><td style="color:var(--muted)">${fmt(r.oppPace)}</td><td>${fmt(r.adjPace)}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('detail-output').innerHTML = `
+    <div class="detail-section">
+      <div class="detail-header"><h3>${teamName}</h3><div class="sub">Last 7 Games · Points & Pace Detail</div></div>
+      <div class="detail-table"><table>
+        <thead><tr>
+          <th>Date</th><th style="text-align:left">Matchup</th><th>W/L</th><th>Pts</th>
+          <th>Total</th><th>Opp Avg</th><th>Adj Total</th><th>Pace</th><th>Opp Pace</th><th>Adj Pace</th>
+        </tr></thead>
+        <tbody>${tableRows}
+          <tr class="summary-row">
+            <td colspan="4">L7 AVERAGES</td>
+            <td>${fmt(avg(rawTotals))}</td><td></td><td>${fmt(avg(adjTotals))}</td>
+            <td>${fmt(avg(rawPaces))}</td><td></td><td>${fmt(avg(adjPaces))}</td>
+          </tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);padding:8px 0">
+      League Avg Total: <span style="color:var(--gold)">${lgPts}</span>
+      &nbsp;&nbsp; League Avg Pace: <span style="color:var(--gold)">${lgPace}</span>
+    </div>`;
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function sortTable(tableId, colIdx, type) {
+  const table = document.getElementById(tableId), tbody = table.querySelector('tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr:not(.avg-row)')), avgRow = tbody.querySelector('.avg-row');
+  const key = `${tableId}_${colIdx}`;
+  sortState[key] = sortState[key]==='asc' ? 'desc' : 'asc';
+  const asc = sortState[key]==='asc';
+  rows.sort((a,b) => {
+    const av=a.cells[colIdx]?.textContent.trim()||'', bv=b.cells[colIdx]?.textContent.trim()||'';
+    if (type==='num') { const an=parseFloat(av)||0, bn=parseFloat(bv)||0; return asc?an-bn:bn-an; }
+    return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+  table.querySelectorAll('th').forEach((th,i)=>{ th.classList.remove('sort-asc','sort-desc'); if(i===colIdx) th.classList.add(asc?'sort-asc':'sort-desc'); });
+  rows.forEach(r=>tbody.appendChild(r)); if(avgRow) tbody.appendChild(avgRow);
+}
+
+loadData();
+</script>
+</body>
+</html>
