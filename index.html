@@ -5,12 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>NBA Team Analytics</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root {
     --bg: #f5f7fa; --surface: #ffffff; --surface2: #eef1f6;
     --border: #d0d8e4; --accent: #1a6ef5; --accent2: #e05c20;
     --text: #1a2235; --muted: #6b7a99;
     --green: #1a9e5c; --red: #d93535; --gold: #c47f00;
+    --teal: #0e9aad; --purple: #7c3aed;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Mono', monospace; min-height: 100vh; }
@@ -20,53 +22,38 @@
     background-size: 40px 40px; pointer-events: none; z-index: 0;
   }
   .wrapper { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 20px 60px; }
-
   header { padding: 36px 0 24px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
   .header-inner { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
   .eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 4px; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
   h1 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(28px,5vw,52px); font-weight: 900; line-height: 1; letter-spacing: -1px; }
   h1 span { color: var(--accent); }
-
   .top-bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 24px; }
   .updated-pill { font-size: 11px; color: var(--muted); padding: 6px 14px; border: 1px solid var(--border); background: var(--surface); }
   .updated-pill span { color: var(--accent); }
-
   .btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; padding: 10px 22px; border: 1px solid; cursor: pointer; transition: all 0.15s; background: transparent; }
   .btn-primary { border-color: var(--accent); color: var(--accent); }
   .btn-primary:hover { background: var(--accent); color: var(--bg); }
-
-  /* Info box */
   .info-box { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 16px 20px; margin-bottom: 24px; font-size: 11px; color: var(--muted); line-height: 1.9; }
   .info-box strong { color: var(--text); }
-
-  /* Status bar */
   .status-bar { display: flex; gap: 24px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 24px; font-size: 11px; flex-wrap: wrap; }
   .stat-pill { display: flex; gap: 8px; align-items: center; }
   .stat-pill .label { color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
   .stat-pill .val { color: var(--accent); font-weight: 500; }
-
-  /* Loading / error */
   #loading { text-align: center; padding: 80px 20px; }
   .spinner { width: 48px; height: 48px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 20px; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-text { font-size: 12px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
   #error-msg { display: none; padding: 16px 20px; border: 1px solid var(--red); background: rgba(255,68,68,0.05); color: var(--red); font-size: 12px; margin-bottom: 20px; line-height: 1.8; }
-
-  /* Tabs */
-  .tabs-row { display: flex; border-bottom: 1px solid var(--border); }
+  .tabs-row { display: flex; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
   .view-tab { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 24px; border: none; background: transparent; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
   .view-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
   .view-tab:hover:not(.active) { color: var(--text); }
   .tab-panel { display: none; padding-top: 24px; }
   .tab-panel.active { display: block; }
-
-  /* Section headers */
   .section-header { display: flex; align-items: center; gap: 16px; margin: 0 0 16px; }
   .section-header h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
   .section-header .line { flex: 1; height: 1px; background: var(--border); }
   .section-header .tag { font-size: 10px; letter-spacing: 2px; color: var(--accent2); border: 1px solid var(--accent2); padding: 2px 8px; text-transform: uppercase; }
-
-  /* Tables */
   .table-wrap { overflow-x: auto; margin-bottom: 8px; }
   table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 800px; }
   thead tr { border-bottom: 2px solid var(--accent); }
@@ -83,8 +70,6 @@
   td:nth-child(2) { text-align: left; font-weight: 700; color: var(--text); font-size: 15px; }
   .hot { color: var(--green); } .warm { color: var(--gold); }
   .cool { color: var(--accent); } .cold { color: var(--red); }
-
-  /* Detail */
   .detail-section { background: var(--surface); border: 1px solid var(--border); margin-bottom: 24px; }
   .detail-header { background: var(--surface2); padding: 14px 20px; border-bottom: 1px solid var(--border); }
   .detail-header h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 1px; color: var(--accent); }
@@ -94,48 +79,26 @@
   .detail-table th { font-size: 12px; padding: 8px 10px; }
   .detail-table td { font-size: 13px; padding: 8px 10px; }
   .detail-table tbody tr.summary-row { background: rgba(0,212,255,0.06); border-top: 1px solid var(--accent); font-weight: 500; color: var(--accent); }
-
   .detail-picker { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
   .detail-picker label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; }
   .detail-picker select { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; cursor: pointer; min-width: 220px; }
-
   .league-footer { display: flex; gap: 32px; padding: 16px 0; margin-top: 8px; border-top: 1px solid var(--border); flex-wrap: wrap; }
   .league-stat .lbl { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
   .league-stat .val { font-size: 20px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; color: var(--gold); }
-
   #main { display: none; }
-
-  /* ── Splits ─────────────────────────────────────────────── */
   .team-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
-  .team-btn {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px;
-    letter-spacing: 1px; text-transform: uppercase;
-    padding: 8px 14px; border: 1px solid var(--border); background: var(--surface2);
-    color: var(--muted); cursor: pointer; transition: all 0.15s;
-  }
+  .team-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; padding: 8px 14px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; transition: all 0.15s; }
   .team-btn:hover { border-color: var(--accent); color: var(--accent); }
   .team-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
-
   .splits-card { background: var(--surface); border: 1px solid var(--border); margin-bottom: 24px; }
-  .splits-card-header {
-    background: var(--surface2); padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
-  }
+  .splits-card-header { background: var(--surface2); padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
   .splits-card-header h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: 1px; color: var(--text); }
   .splits-card-header .meta { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
-
   .splits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
   @media(max-width:700px){ .splits-grid { grid-template-columns: 1fr; } }
-
   .split-half { padding: 18px 20px; }
   .split-half:first-child { border-right: 1px solid var(--border); }
-  .split-half-title {
-    font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
-    letter-spacing: 3px; text-transform: uppercase; color: var(--muted);
-    margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
-  }
-
+  .split-half-title { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
   .splits-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.04); }
   .splits-row:last-child { border-bottom: none; }
   .splits-label { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
@@ -144,31 +107,55 @@
   .splits-val .sv-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 1px; }
   .splits-val .sv-num { font-size: 15px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; color: var(--text); }
   .splits-val .sv-margin { font-size: 12px; font-weight: 600; }
-
-  .pos { color: var(--green); }
-  .neg { color: var(--red); }
-  .neu { color: var(--muted); }
-
+  .pos { color: var(--green); } .neg { color: var(--red); } .neu { color: var(--muted); }
   .special-flags { padding: 12px 20px; border-top: 1px solid var(--border); background: rgba(26,110,245,0.04); display: flex; flex-wrap: wrap; gap: 8px; }
-  .flag {
-    font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-    padding: 4px 10px; border-radius: 2px;
-    background: rgba(26,110,245,0.1); border: 1px solid rgba(26,110,245,0.3); color: var(--accent);
-  }
+  .flag { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; background: rgba(26,110,245,0.1); border: 1px solid rgba(26,110,245,0.3); color: var(--accent); }
   .flag.home-flag { background: rgba(26,180,90,0.1); border-color: rgba(26,180,90,0.3); color: var(--green); }
   .flag.road-flag { background: rgba(200,80,30,0.1); border-color: rgba(200,80,30,0.3); color: var(--accent2); }
-
-  .final-margin-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 12px 20px; border-top: 2px solid var(--border);
-    font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1px;
-  }
+  .final-margin-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-top: 2px solid var(--border); font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1px; }
   .final-margin-row .fm-label { color: var(--muted); text-transform: uppercase; }
   .final-margin-row .fm-vals { display: flex; gap: 28px; }
   .final-margin-row .fm-item { text-align: right; }
   .final-margin-row .fm-item span { display: block; font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
   .hr-diff { font-size: 13px; color: var(--muted); }
   #splits-placeholder { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+
+  /* ── RATINGS TAB ─────────────────────────────────────────── */
+  .rtg-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+  .rtg-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; padding: 7px 16px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+  .rtg-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .rtg-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+  .rtg-search { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 7px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; width: 180px; margin-left: auto; }
+  .rtg-search:focus { outline: none; border-color: var(--accent); }
+  .rtg-bar-wrap { position: relative; display: inline-block; min-width: 50px; }
+  .rtg-bar { position: absolute; left: 0; top: 0; bottom: 0; opacity: 0.12; pointer-events: none; }
+  .rtg-val { position: relative; }
+  .badge-pos { color: var(--green); font-weight: 600; }
+  .badge-neg { color: var(--red); font-weight: 600; }
+
+  /* ── FOULS TAB ───────────────────────────────────────────── */
+  .foul-stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .foul-stat-card { background: var(--surface); border: 1px solid var(--border); padding: 12px 14px; }
+  .foul-stat-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 4px; }
+  .foul-stat-val { font-size: 1.35rem; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; }
+  .foul-stat-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .foul-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+  .foul-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; padding: 7px 16px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+  .foul-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .foul-btn.active-o { border-color: var(--accent2); background: var(--accent2); color: #fff; }
+  .foul-btn.active-t { border-color: var(--teal); background: var(--teal); color: #fff; }
+  .foul-btn.active-p { border-color: var(--purple); background: var(--purple); color: #fff; }
+  .foul-btn.active-w { border-color: var(--accent); background: var(--accent); color: #fff; }
+  .chart-wrap { background: var(--surface); border: 1px solid var(--border); padding: 20px; margin-bottom: 20px; }
+  .chart-wrap canvas { max-height: 280px; }
+  .foul-table-wrap { overflow-x: auto; }
+  .foul-table-wrap table { min-width: 600px; }
+  .foul-chip { display: inline-block; font-size: 10px; padding: 1px 6px; border: 1px solid; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 1px; }
+  .foul-chip-up { border-color: var(--green); color: var(--green); }
+  .foul-chip-dn { border-color: var(--red); color: var(--red); }
+  .foul-bar-wrap { position: relative; }
+  .foul-bar { position: absolute; left: 0; top: 0; bottom: 0; opacity: 0.1; pointer-events: none; }
+  .foul-bar-val { position: relative; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -182,20 +169,15 @@
     </div>
   </header>
 
-  <div id="loading">
-    <div class="spinner"></div>
-    <div class="loading-text">Loading Stats Data...</div>
-  </div>
-
+  <div id="loading"><div class="spinner"></div><div class="loading-text">Loading Stats Data...</div></div>
   <div id="error-msg"></div>
 
   <div id="main">
     <div class="info-box">
-      <strong>How this works:</strong> Data is fetched automatically every day via GitHub Actions running your Python script.
-      To refresh manually, go to your repo → <strong>Actions tab</strong> → <strong>Fetch NBA Stats</strong> → <strong>Run workflow</strong>.
+      <strong>How this works:</strong> Data fetched automatically every day via GitHub Actions.
+      To refresh: repo → <strong>Actions</strong> → <strong>Fetch NBA Stats</strong> → <strong>Run workflow</strong>.
       Last updated: <span id="updated-time" style="color:var(--accent)">—</span>
     </div>
-
     <div class="status-bar" id="status-bar"></div>
 
     <div class="tabs-row">
@@ -203,49 +185,43 @@
       <button class="view-tab" onclick="switchTab('pace',this)">Pace Table</button>
       <button class="view-tab" onclick="switchTab('detail',this)">Team Detail</button>
       <button class="view-tab" onclick="switchTab('splits',this)">Splits</button>
+      <button class="view-tab" onclick="switchTab('ratings',this)">Ratings</button>
+      <button class="view-tab" onclick="switchTab('fouls',this)">Fouls &amp; FTA</button>
     </div>
 
+    <!-- POINTS -->
     <div class="tab-panel active" id="tab-points">
       <div class="section-header"><h2>Team Points Rankings</h2><div class="line"></div><div class="tag">Click column to sort</div></div>
       <div class="table-wrap"><table id="points-table">
         <thead><tr>
-          <th>#</th>
-          <th onclick="sortTable('points-table',1,'text')">Team</th>
-          <th onclick="sortTable('points-table',2,'num')">Avg Pts</th>
-          <th onclick="sortTable('points-table',3,'num')">L20</th>
-          <th onclick="sortTable('points-table',4,'num')">L14</th>
-          <th onclick="sortTable('points-table',5,'num')">L7</th>
-          <th onclick="sortTable('points-table',6,'num')">Adj L7</th>
-          <th onclick="sortTable('points-table',7,'num')">L3</th>
-          <th onclick="sortTable('points-table',8,'num')">Adj L3</th>
-          <th onclick="sortTable('points-table',9,'num')">Pts Score</th>
-          <th onclick="sortTable('points-table',10,'num')">O/228</th>
-          <th onclick="sortTable('points-table',11,'num')">GP</th>
+          <th>#</th><th onclick="sortTable('points-table',1,'text')">Team</th>
+          <th onclick="sortTable('points-table',2,'num')">Avg Pts</th><th onclick="sortTable('points-table',3,'num')">L20</th>
+          <th onclick="sortTable('points-table',4,'num')">L14</th><th onclick="sortTable('points-table',5,'num')">L7</th>
+          <th onclick="sortTable('points-table',6,'num')">Adj L7</th><th onclick="sortTable('points-table',7,'num')">L3</th>
+          <th onclick="sortTable('points-table',8,'num')">Adj L3</th><th onclick="sortTable('points-table',9,'num')">Pts Score</th>
+          <th onclick="sortTable('points-table',10,'num')">O/228</th><th onclick="sortTable('points-table',11,'num')">GP</th>
         </tr></thead>
         <tbody id="points-body"></tbody>
       </table></div>
     </div>
 
+    <!-- PACE -->
     <div class="tab-panel" id="tab-pace">
       <div class="section-header"><h2>Team Pace Rankings</h2><div class="line"></div><div class="tag">Click column to sort</div></div>
       <div class="table-wrap"><table id="pace-table">
         <thead><tr>
-          <th>#</th>
-          <th onclick="sortTable('pace-table',1,'text')">Team</th>
-          <th onclick="sortTable('pace-table',2,'num')">Avg Pace</th>
-          <th onclick="sortTable('pace-table',3,'num')">L20</th>
-          <th onclick="sortTable('pace-table',4,'num')">L14</th>
-          <th onclick="sortTable('pace-table',5,'num')">L7</th>
-          <th onclick="sortTable('pace-table',6,'num')">Adj L7</th>
-          <th onclick="sortTable('pace-table',7,'num')">L3</th>
-          <th onclick="sortTable('pace-table',8,'num')">Adj L3</th>
-          <th onclick="sortTable('pace-table',9,'num')">Pace Score</th>
+          <th>#</th><th onclick="sortTable('pace-table',1,'text')">Team</th>
+          <th onclick="sortTable('pace-table',2,'num')">Avg Pace</th><th onclick="sortTable('pace-table',3,'num')">L20</th>
+          <th onclick="sortTable('pace-table',4,'num')">L14</th><th onclick="sortTable('pace-table',5,'num')">L7</th>
+          <th onclick="sortTable('pace-table',6,'num')">Adj L7</th><th onclick="sortTable('pace-table',7,'num')">L3</th>
+          <th onclick="sortTable('pace-table',8,'num')">Adj L3</th><th onclick="sortTable('pace-table',9,'num')">Pace Score</th>
           <th onclick="sortTable('pace-table',10,'num')">GP</th>
         </tr></thead>
         <tbody id="pace-body"></tbody>
       </table></div>
     </div>
 
+    <!-- DETAIL -->
     <div class="tab-panel" id="tab-detail">
       <div class="section-header"><h2>Last 7 Games Detail</h2><div class="line"></div></div>
       <div class="detail-picker">
@@ -255,11 +231,69 @@
       <div id="detail-output"></div>
     </div>
 
-
+    <!-- SPLITS -->
     <div class="tab-panel" id="tab-splits">
       <div class="section-header"><h2>Team Splits</h2><div class="line"></div><div class="tag">2025-26 Season</div></div>
       <div class="team-grid" id="splits-team-grid"></div>
       <div id="splits-output"><div id="splits-placeholder">Select a team above to view splits</div></div>
+    </div>
+
+    <!-- RATINGS -->
+    <div class="tab-panel" id="tab-ratings">
+      <div class="section-header"><h2>Offensive &amp; Defensive Ratings</h2><div class="line"></div><div class="tag">SOS-Adjusted</div></div>
+      <div class="rtg-controls">
+        <button class="rtg-btn active" onclick="rtgWindow('season',this)">Season</button>
+        <button class="rtg-btn"        onclick="rtgWindow('l14',this)">Last 14</button>
+        <button class="rtg-btn"        onclick="rtgWindow('l7',this)">Last 7</button>
+        <button class="rtg-btn active" onclick="rtgToggleAdj('adj',this)" id="rtg-adj-btn">Adjusted</button>
+        <button class="rtg-btn"        onclick="rtgToggleAdj('raw',this)" id="rtg-raw-btn">Raw</button>
+        <input  class="rtg-search" type="text" placeholder="Search team…" oninput="rtgFilter(this.value)">
+      </div>
+      <div class="table-wrap">
+        <table id="rtg-table">
+          <thead><tr>
+            <th style="text-align:left;cursor:default">#</th>
+            <th onclick="rtgSort('team')"     style="text-align:left">Team</th>
+            <th onclick="rtgSort('adj_net')"  class="sort-desc">Adj Net</th>
+            <th onclick="rtgSort('adj_ortg')">Adj ORTG</th>
+            <th onclick="rtgSort('adj_drtg')">Adj DRTG</th>
+            <th onclick="rtgSort('net')">Net</th>
+            <th onclick="rtgSort('ortg')">ORTG</th>
+            <th onclick="rtgSort('drtg')">DRTG</th>
+            <th onclick="rtgSort('pace')">Pace</th>
+            <th onclick="rtgSort('games')">GP</th>
+          </tr></thead>
+          <tbody id="rtg-body"><tr><td colspan="10" style="text-align:center;color:var(--muted);padding:2rem">Loading...</td></tr></tbody>
+        </table>
+      </div>
+      <div style="font-size:11px;color:var(--muted);padding:8px 4px" id="rtg-lg-avg"></div>
+    </div>
+
+    <!-- FOULS & FTA -->
+    <div class="tab-panel" id="tab-fouls">
+      <div class="section-header"><h2>Fouls &amp; Free Throw Attempts</h2><div class="line"></div><div class="tag">Both Teams Combined</div></div>
+      <div class="foul-stat-row" id="foul-stat-cards"><div style="color:var(--muted);font-size:11px">Loading...</div></div>
+      <div class="foul-controls">
+        <button class="foul-btn active-o" onclick="foulToggle('fouls',this)" id="foul-btn-f">Fouls/Gm</button>
+        <button class="foul-btn"          onclick="foulToggle('fta',this)"   id="foul-btn-t">FTA/Gm</button>
+        <button class="foul-btn"          onclick="foulToggle('ratio',this)" id="foul-btn-r">FTA/Foul</button>
+        <button class="foul-btn active-w" onclick="foulWin(30,this)"         id="foul-btn-30">30-game</button>
+        <button class="foul-btn"          onclick="foulWin(10,this)"         id="foul-btn-10">10-game</button>
+      </div>
+      <div class="chart-wrap"><canvas id="foul-chart"></canvas></div>
+      <div class="foul-table-wrap">
+        <table id="foul-table">
+          <thead><tr>
+            <th style="text-align:left;cursor:default">Stretch</th>
+            <th>Games</th>
+            <th onclick="foulSortTable(2)">Fouls/Gm</th>
+            <th onclick="foulSortTable(3)">FTA/Gm</th>
+            <th onclick="foulSortTable(4)">FTA/Foul</th>
+            <th>vs Avg</th>
+          </tr></thead>
+          <tbody id="foul-tbody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:2rem">Loading...</td></tr></tbody>
+        </table>
+      </div>
     </div>
 
     <div class="league-footer" id="league-footer"></div>
@@ -267,13 +301,15 @@
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════════════
+// EXISTING FUNCTIONALITY (unchanged)
+// ═══════════════════════════════════════════════════════════
 let statsData = null;
 let sortState = {};
 const THRESHOLD = 228;
 
 async function loadData() {
   try {
-    // Cache-bust so we always get the latest JSON
     const res = await fetch(`data/nba_stats.json?t=${Date.now()}`);
     if (!res.ok) throw new Error(`Could not load data/nba_stats.json (${res.status}). Have you run the GitHub Action yet?`);
     statsData = await res.json();
@@ -283,11 +319,7 @@ async function loadData() {
   } catch(e) {
     document.getElementById('loading').style.display = 'none';
     const err = document.getElementById('error-msg');
-    err.innerHTML = `⚠ ${e.message}<br><br>
-      <strong>To generate the data file:</strong><br>
-      1. Push all three files to your GitHub repo<br>
-      2. Go to your repo → Actions tab → "Fetch NBA Stats" → Run workflow<br>
-      3. Wait ~2 minutes, then refresh this page`;
+    err.innerHTML = `⚠ ${e.message}<br><br><strong>To generate the data file:</strong><br>1. Push all files to your GitHub repo<br>2. Go to your repo → Actions tab → "Fetch NBA Stats" → Run workflow<br>3. Wait ~2 minutes, then refresh this page`;
     err.style.display = 'block';
   }
 }
@@ -310,28 +342,28 @@ function colAvg(data, f) {
 
 function renderAll() {
   const d = statsData;
-  document.getElementById('updated-time').textContent = d.updatedAt;
+  document.getElementById('updated-time').textContent = d.updatedAt || d.updated || '—';
   document.getElementById('status-bar').innerHTML = `
-    <div class="stat-pill"><span class="label">Teams</span><span class="val">${d.pointsData.length}</span></div>
-    <div class="stat-pill"><span class="label">Season</span><span class="val">${d.season}</span></div>
-    <div class="stat-pill"><span class="label">O/U Line</span><span class="val">${d.pointsThreshold}</span></div>
-    <div class="stat-pill"><span class="label">Updated</span><span class="val">${d.updatedAt}</span></div>`;
+    <div class="stat-pill"><span class="label">Teams</span><span class="val">${(d.pointsData||[]).length||30}</span></div>
+    <div class="stat-pill"><span class="label">Season</span><span class="val">${d.season||'2025-26'}</span></div>
+    <div class="stat-pill"><span class="label">O/U Line</span><span class="val">${d.pointsThreshold||228}</span></div>
+    <div class="stat-pill"><span class="label">Updated</span><span class="val">${d.updatedAt||d.updated||'—'}</span></div>`;
 
   document.getElementById('league-footer').innerHTML = `
-    <div class="league-stat"><div class="lbl">League Avg Total Pts</div><div class="val">${d.leagueAvgPoints}</div></div>
-    <div class="league-stat"><div class="lbl">League Avg Pace</div><div class="val">${d.leagueAvgPace}</div></div>`;
+    <div class="league-stat"><div class="lbl">League Avg Total Pts</div><div class="val">${d.leagueAvgPoints||'—'}</div></div>
+    <div class="league-stat"><div class="lbl">League Avg Pace</div><div class="val">${d.leagueAvgPace||'—'}</div></div>
+    <div class="league-stat"><div class="lbl">League Avg ORTG</div><div class="val">${d.league_avg?.ortg||'—'}</div></div>
+    <div class="league-stat"><div class="lbl">League Avg DRTG</div><div class="val">${d.league_avg?.drtg||'—'}</div></div>`;
 
-  renderPointsTable();
-  renderPaceTable();
-  renderTeamSelect();
+  if (d.pointsData) { renderPointsTable(); renderPaceTable(); renderTeamSelect(); }
+  if (d.ratings)    { rtgRender(); }
+  if (d.fouls)      { foulInit(); }
 }
 
 function renderPointsTable() {
-  const data = statsData.pointsData;
-  const avg = statsData.leagueAvgPoints;
+  const data = statsData.pointsData; const avg = statsData.leagueAvgPoints;
   document.getElementById('points-body').innerHTML =
-    data.map((r,i) => `<tr>
-      <td>${i+1}</td><td>${r.team}</td>
+    data.map((r,i) => `<tr><td>${i+1}</td><td>${r.team}</td>
       <td class="${heat(r.avgPts,avg,20)}">${fmt(r.avgPts)}</td>
       <td class="${heat(r.l20Pts,avg,20)}">${fmt(r.l20Pts)}</td>
       <td class="${heat(r.l14Pts,avg,20)}">${fmt(r.l14Pts)}</td>
@@ -350,11 +382,9 @@ function renderPointsTable() {
 }
 
 function renderPaceTable() {
-  const data = statsData.paceData;
-  const avg = statsData.leagueAvgPace;
+  const data = statsData.paceData; const avg = statsData.leagueAvgPace;
   document.getElementById('pace-body').innerHTML =
-    data.map((r,i) => `<tr>
-      <td>${i+1}</td><td>${r.team}</td>
+    data.map((r,i) => `<tr><td>${i+1}</td><td>${r.team}</td>
       <td class="${heat(r.avgPace,avg,6)}">${fmt(r.avgPace)}</td>
       <td class="${heat(r.l20Pace,avg,6)}">${fmt(r.l20Pace)}</td>
       <td class="${heat(r.l14Pace,avg,6)}">${fmt(r.l14Pace)}</td>
@@ -372,59 +402,41 @@ function renderPaceTable() {
 }
 
 function renderTeamSelect() {
-  const teams = Object.keys(statsData.detailData).sort();
+  const teams = Object.keys(statsData.detailData||{}).sort();
   document.getElementById('teamSelect').innerHTML =
-    '<option value="">-- Choose a team --</option>' +
-    teams.map(t => `<option value="${t}">${t}</option>`).join('');
+    '<option value="">-- Choose a team --</option>' + teams.map(t=>`<option value="${t}">${t}</option>`).join('');
 }
 
 function renderDetail() {
   const teamName = document.getElementById('teamSelect').value;
   if (!teamName) { document.getElementById('detail-output').innerHTML = ''; return; }
-  const rows = statsData.detailData[teamName] || [];
-  const threshold = statsData.pointsThreshold;
-  const lgPts  = statsData.leagueAvgPoints;
-  const lgPace = statsData.leagueAvgPace;
-
-  let adjTotals = rows.map(r => r.adjTotal);
-  let adjPaces  = rows.map(r => r.adjPace);
-  let rawTotals = rows.map(r => r.total);
-  let rawPaces  = rows.map(r => r.pace);
-  const avg = arr => arr.reduce((a,b)=>a+b,0)/arr.length;
-
-  const tableRows = rows.map(r => {
-    const wlC = r.wl==='W' ? 'var(--green)' : 'var(--red)';
-    const totC = r.total >= threshold ? 'var(--green)' : 'var(--red)';
-    return `<tr>
-      <td>${r.date}</td><td style="text-align:left">${r.matchup}</td>
+  const rows = statsData.detailData[teamName]||[], threshold=statsData.pointsThreshold, lgPts=statsData.leagueAvgPoints, lgPace=statsData.leagueAvgPace;
+  let adjTotals=rows.map(r=>r.adjTotal), adjPaces=rows.map(r=>r.adjPace), rawTotals=rows.map(r=>r.total), rawPaces=rows.map(r=>r.pace);
+  const avg=arr=>arr.reduce((a,b)=>a+b,0)/arr.length;
+  const tableRows=rows.map(r=>{
+    const wlC=r.wl==='W'?'var(--green)':'var(--red)', totC=r.total>=threshold?'var(--green)':'var(--red)';
+    return `<tr><td>${r.date}</td><td style="text-align:left">${r.matchup}</td>
       <td style="color:${wlC};font-weight:600">${r.wl}</td><td>${r.pts}</td>
       <td style="color:${totC}">${fmt(r.total)}</td>
       <td style="color:var(--muted)">${fmt(r.oppAvg)}</td><td>${fmt(r.adjTotal)}</td>
-      <td>${fmt(r.pace)}</td><td style="color:var(--muted)">${fmt(r.oppPace)}</td><td>${fmt(r.adjPace)}</td>
-    </tr>`;
+      <td>${fmt(r.pace)}</td><td style="color:var(--muted)">${fmt(r.oppPace)}</td><td>${fmt(r.adjPace)}</td></tr>`;
   }).join('');
-
   document.getElementById('detail-output').innerHTML = `
     <div class="detail-section">
       <div class="detail-header"><h3>${teamName}</h3><div class="sub">Last 7 Games · Points & Pace Detail</div></div>
       <div class="detail-table"><table>
-        <thead><tr>
-          <th>Date</th><th style="text-align:left">Matchup</th><th>W/L</th><th>Pts</th>
-          <th>Total</th><th>Opp Avg</th><th>Adj Total</th><th>Pace</th><th>Opp Pace</th><th>Adj Pace</th>
-        </tr></thead>
+        <thead><tr><th>Date</th><th style="text-align:left">Matchup</th><th>W/L</th><th>Pts</th>
+          <th>Total</th><th>Opp Avg</th><th>Adj Total</th><th>Pace</th><th>Opp Pace</th><th>Adj Pace</th></tr></thead>
         <tbody>${tableRows}
-          <tr class="summary-row">
-            <td colspan="4">L7 AVERAGES</td>
+          <tr class="summary-row"><td colspan="4">L7 AVERAGES</td>
             <td>${fmt(avg(rawTotals))}</td><td></td><td>${fmt(avg(adjTotals))}</td>
-            <td>${fmt(avg(rawPaces))}</td><td></td><td>${fmt(avg(adjPaces))}</td>
-          </tr>
+            <td>${fmt(avg(rawPaces))}</td><td></td><td>${fmt(avg(adjPaces))}</td></tr>
         </tbody>
       </table></div>
     </div>
     <div style="font-size:11px;color:var(--muted);padding:8px 0">
       League Avg Total: <span style="color:var(--gold)">${lgPts}</span>
-      &nbsp;&nbsp; League Avg Pace: <span style="color:var(--gold)">${lgPace}</span>
-    </div>`;
+      &nbsp;&nbsp; League Avg Pace: <span style="color:var(--gold)">${lgPace}</span></div>`;
 }
 
 function switchTab(name, btn) {
@@ -435,23 +447,197 @@ function switchTab(name, btn) {
 }
 
 function sortTable(tableId, colIdx, type) {
-  const table = document.getElementById(tableId), tbody = table.querySelector('tbody');
-  const rows = Array.from(tbody.querySelectorAll('tr:not(.avg-row)')), avgRow = tbody.querySelector('.avg-row');
-  const key = `${tableId}_${colIdx}`;
-  sortState[key] = sortState[key]==='asc' ? 'desc' : 'asc';
-  const asc = sortState[key]==='asc';
-  rows.sort((a,b) => {
+  const table=document.getElementById(tableId), tbody=table.querySelector('tbody');
+  const rows=Array.from(tbody.querySelectorAll('tr:not(.avg-row)')), avgRow=tbody.querySelector('.avg-row');
+  const key=`${tableId}_${colIdx}`;
+  sortState[key]=sortState[key]==='asc'?'desc':'asc';
+  const asc=sortState[key]==='asc';
+  rows.sort((a,b)=>{
     const av=a.cells[colIdx]?.textContent.trim()||'', bv=b.cells[colIdx]?.textContent.trim()||'';
-    if (type==='num') { const an=parseFloat(av)||0, bn=parseFloat(bv)||0; return asc?an-bn:bn-an; }
-    return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+    if(type==='num'){const an=parseFloat(av)||0,bn=parseFloat(bv)||0;return asc?an-bn:bn-an;}
+    return asc?av.localeCompare(bv):bv.localeCompare(av);
   });
-  table.querySelectorAll('th').forEach((th,i)=>{ th.classList.remove('sort-asc','sort-desc'); if(i===colIdx) th.classList.add(asc?'sort-asc':'sort-desc'); });
+  table.querySelectorAll('th').forEach((th,i)=>{th.classList.remove('sort-asc','sort-desc');if(i===colIdx)th.classList.add(asc?'sort-asc':'sort-desc');});
   rows.forEach(r=>tbody.appendChild(r)); if(avgRow) tbody.appendChild(avgRow);
 }
 
-loadData();
+// ═══════════════════════════════════════════════════════════
+// RATINGS TAB
+// ═══════════════════════════════════════════════════════════
+let RTG_DATA=[], RTG_WINDOW='season', RTG_ADJ=true, RTG_SORT='adj_net', RTG_ASC=false, RTG_FILTER='';
 
-// ── SPLITS DATA (hardcoded 2025-26 season) ────────────────────────────────────
+function rtgRender() {
+  if (!statsData?.ratings) return;
+  RTG_DATA = Object.entries(statsData.ratings).map(([name,v])=>({team:name,...v.season,...v,...{season:v.season,l14:v.l14,l7:v.l7}}));
+  rtgDraw();
+}
+
+function rtgWindow(w,btn) {
+  RTG_WINDOW=w;
+  document.querySelectorAll('.rtg-btn').forEach(b=>{ if(['Season','Last 14','Last 7'].includes(b.textContent)) b.classList.remove('active'); });
+  btn.classList.add('active');
+  rtgDraw();
+}
+
+function rtgToggleAdj(type,btn) {
+  RTG_ADJ=(type==='adj');
+  document.querySelectorAll('.rtg-btn').forEach(b=>{ if(['Adjusted','Raw'].includes(b.textContent)) b.classList.remove('active'); });
+  btn.classList.add('active');
+  rtgDraw();
+}
+
+function rtgFilter(v) { RTG_FILTER=v.toLowerCase(); rtgDraw(); }
+
+function rtgSort(col) {
+  if(RTG_SORT===col) RTG_ASC=!RTG_ASC;
+  else { RTG_SORT=col; RTG_ASC=(col==='drtg'||col==='adj_drtg'); }
+  rtgDraw();
+}
+
+function rtgDraw() {
+  let rows = RTG_DATA.map(r=>({...r,...(r[RTG_WINDOW]||{})}));
+  if(RTG_FILTER) rows=rows.filter(r=>r.team.toLowerCase().includes(RTG_FILTER));
+  rows.sort((a,b)=>{ const av=a[RTG_SORT]??0,bv=b[RTG_SORT]??0; return RTG_ASC?av-bv:bv-av; });
+
+  const maxO=Math.max(...rows.map(r=>(RTG_ADJ?r.adj_ortg:r.ortg)||0));
+  const maxD=Math.max(...rows.map(r=>(RTG_ADJ?r.adj_drtg:r.drtg)||0));
+
+  document.querySelectorAll('#rtg-table th').forEach((th,i)=>th.classList.remove('sort-asc','sort-desc'));
+
+  document.getElementById('rtg-body').innerHTML = rows.map((r,i)=>{
+    const net  = RTG_ADJ ? r.adj_net  : r.net;
+    const ortg = RTG_ADJ ? r.adj_ortg : r.ortg;
+    const drtg = RTG_ADJ ? r.adj_drtg : r.drtg;
+    const netCls = net>0?'badge-pos':net<0?'badge-neg':'';
+    const op=(((ortg||0)/maxO)*100).toFixed(1), dp=(((drtg||0)/maxD)*100).toFixed(1);
+    return `<tr>
+      <td>${i+1}</td>
+      <td style="text-align:left;font-weight:700">${r.team}</td>
+      <td><span class="${netCls}">${net>0?'+':''}${net??0}</span></td>
+      <td class="rtg-bar-wrap"><div class="rtg-bar" style="width:${op}%;background:var(--accent2)"></div><span class="rtg-val" style="color:var(--accent2)">${ortg??0}</span></td>
+      <td class="rtg-bar-wrap"><div class="rtg-bar" style="width:${dp}%;background:var(--teal)"></div><span class="rtg-val" style="color:var(--teal)">${drtg??0}</span></td>
+      <td><span class="${r.net>0?'badge-pos':r.net<0?'badge-neg':''}">${r.net>0?'+':''}${r.net??0}</span></td>
+      <td style="color:var(--muted)">${r.ortg??0}</td>
+      <td style="color:var(--muted)">${r.drtg??0}</td>
+      <td style="color:var(--muted)">${r.pace??0}</td>
+      <td style="color:var(--muted)">${r.games??0}</td></tr>`;
+  }).join('');
+
+  const la=statsData.league_avg||{};
+  document.getElementById('rtg-lg-avg').textContent =
+    la.ortg ? `League avg — ORTG: ${la.ortg}  DRTG: ${la.drtg}` : '';
+}
+
+// ═══════════════════════════════════════════════════════════
+// FOULS & FTA TAB
+// ═══════════════════════════════════════════════════════════
+let FOUL_RAW=[], FOUL_STRETCHES=[], FOUL_WIN=30, FOUL_CHART=null;
+let FOUL_SHOW={fouls:true,fta:false,ratio:false};
+let FOUL_SORT_COL=0, FOUL_SORT_ASC=true;
+
+function foulInit() {
+  FOUL_RAW = statsData?.fouls?.games || [];
+  if(!FOUL_RAW.length) {
+    document.getElementById('foul-tbody').innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:2rem">No fouls data yet — run fetch_nba.py</td></tr>';
+    return;
+  }
+  foulBuild(FOUL_WIN);
+}
+
+function foulBuild(w) {
+  FOUL_STRETCHES=[];
+  for(let i=0;i<FOUL_RAW.length;i+=w){
+    const c=FOUL_RAW.slice(i,i+w); const n=c.length;
+    const sf=c.reduce((s,g)=>s+g.total_pf,0); const st=c.reduce((s,g)=>s+g.total_fta,0);
+    FOUL_STRETCHES.push({stretch:`${i+1}–${i+n}`,games:n,fouls:+(sf/n).toFixed(2),fta:+(st/n).toFixed(2),ratio:+(st/sf).toFixed(3)});
+  }
+  foulCards(); foulChart(); foulTable();
+}
+
+function foulWin(w,btn) {
+  FOUL_WIN=w;
+  document.querySelectorAll('.foul-btn').forEach(b=>{ if(b.textContent.includes('game')) b.classList.remove('active-w'); });
+  btn.classList.add('active-w');
+  foulBuild(w);
+}
+
+function foulToggle(k,btn) {
+  FOUL_SHOW[k]=!FOUL_SHOW[k];
+  const cls={fouls:'active-o',fta:'active-t',ratio:'active-p'}[k];
+  btn.className='foul-btn'+(FOUL_SHOW[k]?' '+cls:'');
+  foulChart();
+}
+
+function foulCards() {
+  if(!FOUL_STRETCHES.length) return;
+  const af=FOUL_STRETCHES.reduce((s,d)=>s+d.fouls,0)/FOUL_STRETCHES.length;
+  const at=FOUL_STRETCHES.reduce((s,d)=>s+d.fta,0)/FOUL_STRETCHES.length;
+  const lf=FOUL_STRETCHES[FOUL_STRETCHES.length-1].fouls, lt=FOUL_STRETCHES[FOUL_STRETCHES.length-1].fta;
+  const df=lf-af, dt=lt-at;
+  document.getElementById('foul-stat-cards').innerHTML=`
+    <div class="foul-stat-card"><div class="foul-stat-lbl">Avg Fouls/Gm</div>
+      <div class="foul-stat-val" style="color:var(--accent2)">${af.toFixed(1)}</div>
+      <div class="foul-stat-sub ${df>=0?'pos':'neg'}">Last: ${lf.toFixed(1)} (${df>=0?'+':''}${df.toFixed(1)})</div></div>
+    <div class="foul-stat-card"><div class="foul-stat-lbl">Avg FTA/Gm</div>
+      <div class="foul-stat-val" style="color:var(--teal)">${at.toFixed(1)}</div>
+      <div class="foul-stat-sub ${dt>=0?'pos':'neg'}">Last: ${lt.toFixed(1)} (${dt>=0?'+':''}${dt.toFixed(1)})</div></div>
+    <div class="foul-stat-card"><div class="foul-stat-lbl">FTA/Foul Ratio</div>
+      <div class="foul-stat-val">${(at/af).toFixed(3)}</div>
+      <div class="foul-stat-sub" style="color:var(--muted)">season avg</div></div>
+    <div class="foul-stat-card"><div class="foul-stat-lbl">Stretches</div>
+      <div class="foul-stat-val">${FOUL_STRETCHES.length}</div>
+      <div class="foul-stat-sub" style="color:var(--muted)">${FOUL_STRETCHES.reduce((s,d)=>s+d.games,0)} games</div></div>`;
+}
+
+function foulChart() {
+  const labels=FOUL_STRETCHES.map(d=>d.stretch), ds=[];
+  if(FOUL_SHOW.fouls) ds.push({label:'Fouls/Gm',data:FOUL_STRETCHES.map(d=>d.fouls),borderColor:'#e05c20',backgroundColor:'rgba(224,92,32,0.07)',borderWidth:2,pointRadius:4,fill:true,tension:.35});
+  if(FOUL_SHOW.fta)   ds.push({label:'FTA/Gm',  data:FOUL_STRETCHES.map(d=>d.fta),  borderColor:'#0e9aad',backgroundColor:'rgba(14,154,173,0.07)',borderWidth:2,pointRadius:4,fill:true,tension:.35});
+  if(FOUL_SHOW.ratio) ds.push({label:'FTA/Foul', data:FOUL_STRETCHES.map(d=>d.ratio),borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,0.07)',borderWidth:2,pointRadius:4,fill:false,tension:.35,yAxisID:'y2'});
+  const opts={responsive:true,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{labels:{color:'#6b7a99',font:{family:"'IBM Plex Mono',monospace",size:11}}},
+      tooltip:{backgroundColor:'#fff',borderColor:'#d0d8e4',borderWidth:1,titleColor:'#1a2235',bodyColor:'#6b7a99',
+        titleFont:{family:"'IBM Plex Mono',monospace",size:11},bodyFont:{family:"'IBM Plex Mono',monospace",size:11}}},
+    scales:{
+      x:{ticks:{color:'#6b7a99',font:{family:"'IBM Plex Mono',monospace",size:10}},grid:{color:'rgba(208,216,228,0.5)'}},
+      y:{ticks:{color:'#6b7a99',font:{family:"'IBM Plex Mono',monospace",size:10}},grid:{color:'rgba(208,216,228,0.5)'}},
+      y2:{display:FOUL_SHOW.ratio,position:'right',ticks:{color:'#7c3aed',font:{family:"'IBM Plex Mono',monospace",size:10}},grid:{drawOnChartArea:false}}
+    }};
+  if(FOUL_CHART){FOUL_CHART.data={labels,datasets:ds};FOUL_CHART.options=opts;FOUL_CHART.update();}
+  else FOUL_CHART=new Chart(document.getElementById('foul-chart'),{type:'line',data:{labels,datasets:ds},options:opts});
+}
+
+function foulTable() {
+  const af=FOUL_STRETCHES.reduce((s,d)=>s+d.fouls,0)/FOUL_STRETCHES.length;
+  const mf=Math.max(...FOUL_STRETCHES.map(d=>d.fouls)), mt=Math.max(...FOUL_STRETCHES.map(d=>d.fta));
+  let sorted=[...FOUL_STRETCHES.entries()].map(([i,d])=>({...d,idx:i}));
+  sorted.sort((a,b)=>{
+    const vals=[[a.idx,b.idx],[a.games,b.games],[a.fouls,b.fouls],[a.fta,b.fta],[a.ratio,b.ratio]];
+    const [av,bv]=vals[FOUL_SORT_COL]||[a.idx,b.idx];
+    return FOUL_SORT_ASC?av-bv:bv-av;
+  });
+  document.getElementById('foul-tbody').innerHTML=sorted.map(d=>{
+    const fp=(d.fouls/mf*100).toFixed(1), tp=(d.fta/mt*100).toFixed(1), diff=d.fouls-af;
+    const chip=diff>0?`<span class="foul-chip foul-chip-up">+${diff.toFixed(1)}</span>`:`<span class="foul-chip foul-chip-dn">${diff.toFixed(1)}</span>`;
+    return `<tr>
+      <td style="text-align:left;font-weight:700">${d.stretch}</td>
+      <td style="color:var(--muted)">${d.games}</td>
+      <td class="foul-bar-wrap"><div class="foul-bar" style="width:${fp}%;background:var(--accent2)"></div><span class="foul-bar-val" style="color:var(--accent2)">${d.fouls.toFixed(2)}</span></td>
+      <td class="foul-bar-wrap"><div class="foul-bar" style="width:${tp}%;background:var(--teal)"></div><span class="foul-bar-val" style="color:var(--teal)">${d.fta.toFixed(2)}</span></td>
+      <td style="color:var(--muted)">${d.ratio}</td>
+      <td>${chip}</td></tr>`;
+  }).join('');
+}
+
+function foulSortTable(col) {
+  if(FOUL_SORT_COL===col) FOUL_SORT_ASC=!FOUL_SORT_ASC;
+  else{FOUL_SORT_COL=col;FOUL_SORT_ASC=false;}
+  if(FOUL_STRETCHES.length) foulTable();
+}
+
+// ═══════════════════════════════════════════════════════════
+// SPLITS (unchanged from original)
+// ═══════════════════════════════════════════════════════════
 const SPLITS = {
   'Atlanta Hawks':           { abbr:'ATL', home:{gp:32, h1t:117.9,h1m:0.2,  h2t:115.7,h2m:-0.7, q1t:59.6,q1m:1.6,  q2t:58.3,q2m:-1.3, q3t:60.8,q3m:-0.5, q4t:54.9,q4m:-0.2, fin:-0.5},  road:{gp:33, h1t:121.3,h1m:0.0,  h2t:114.1,h2m:0.5,  q1t:60.8,q1m:-0.5, q2t:60.5,q2m:0.5,  q3t:56.7,q3m:-0.7, q4t:57.4,q4m:1.2,  fin:0.8},  hrDiff:-1.3, flags:['ROAD: H1-H2 Total Diff 7.2 (H1:121.3 H2:114.1)'] },
   'Boston Celtics':          { abbr:'BOS', home:{gp:32, h1t:111.1,h1m:5.5,  h2t:110.9,h2m:1.4,  q1t:56.8,q1m:1.5,  q2t:54.3,q2m:4.0,  q3t:54.7,q3m:0.8,  q4t:56.2,q4m:0.5,  fin:6.9},  road:{gp:33, h1t:113.7,h1m:4.8,  h2t:105.5,h2m:3.2,  q1t:57.3,q1m:2.4,  q2t:56.4,q2m:2.4,  q3t:54.9,q3m:1.7,  q4t:50.6,q4m:1.5,  fin:8.1},  hrDiff:-1.2, flags:['HOME: H1-H2 Margin Diff 4.1','ROAD: H1-H2 Total Diff 8.2 (H1:113.7 H2:105.5)'] },
@@ -491,9 +677,7 @@ function buildSplitsGrid() {
   Object.keys(SPLITS).sort().forEach(name => {
     const d = SPLITS[name];
     const btn = document.createElement('button');
-    btn.className = 'team-btn';
-    btn.textContent = d.abbr;
-    btn.title = name;
+    btn.className = 'team-btn'; btn.textContent = d.abbr; btn.title = name;
     btn.onclick = () => showSplits(name, btn);
     grid.appendChild(btn);
   });
@@ -504,83 +688,45 @@ function fmtM(v) {
   const cls = v > 0 ? 'pos' : v < 0 ? 'neg' : 'neu';
   return `<span class="${cls} sv-margin">${s}</span>`;
 }
-
 function halfRow(label, tot, margin) {
-  return `<div class="splits-row">
-    <span class="splits-label">${label}</span>
+  return `<div class="splits-row"><span class="splits-label">${label}</span>
     <div class="splits-values">
       <div class="splits-val"><span class="sv-label">Total</span><span class="sv-num">${tot.toFixed(1)}</span></div>
       <div class="splits-val"><span class="sv-label">Margin</span>${fmtM(margin)}</div>
-    </div>
-  </div>`;
+    </div></div>`;
 }
-
-function qRow(label, tot, margin) {
-  return `<div class="splits-row">
-    <span class="splits-label">${label}</span>
-    <div class="splits-values">
-      <div class="splits-val"><span class="sv-label">Total</span><span class="sv-num">${tot.toFixed(1)}</span></div>
-      <div class="splits-val"><span class="sv-label">Margin</span>${fmtM(margin)}</div>
-    </div>
-  </div>`;
-}
-
 function showSplits(name, btn) {
   document.querySelectorAll('.team-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-
-  const d = SPLITS[name];
-  const h = d.home, r = d.road;
+  const d = SPLITS[name]; const h = d.home, r = d.road;
   const hrCls = d.hrDiff > 0 ? 'pos' : d.hrDiff < 0 ? 'neg' : 'neu';
-
-  const flags = d.flags.length ? `
-    <div class="special-flags">
-      ${d.flags.map(f => {
-        const cls = f.startsWith('HOME') ? 'home-flag' : 'road-flag';
-        return `<span class="flag ${cls}">⚑ ${f}</span>`;
-      }).join('')}
-    </div>` : '';
-
+  const flags = d.flags.length ? `<div class="special-flags">${d.flags.map(f=>{const cls=f.startsWith('HOME')?'home-flag':'road-flag';return`<span class="flag ${cls}">⚑ ${f}</span>`;}).join('')}</div>` : '';
   document.getElementById('splits-output').innerHTML = `
     <div class="splits-card">
-      <div class="splits-card-header">
-        <h3>${name}</h3>
-        <div class="meta">2025-26 · ${h.gp} Home / ${r.gp} Road games · As of Mar 8 2026</div>
-      </div>
+      <div class="splits-card-header"><h3>${name}</h3><div class="meta">2025-26 · ${h.gp} Home / ${r.gp} Road games</div></div>
       <div class="splits-grid">
-        <div class="split-half">
-          <div class="split-half-title">🏠 Home · ${h.gp} GP</div>
-          ${halfRow('H1', h.h1t, h.h1m)}
-          ${halfRow('H2', h.h2t, h.h2m)}
-          ${qRow('Q1', h.q1t, h.q1m)}
-          ${qRow('Q2', h.q2t, h.q2m)}
-          ${qRow('Q3', h.q3t, h.q3m)}
-          ${qRow('Q4', h.q4t, h.q4m)}
-        </div>
-        <div class="split-half">
-          <div class="split-half-title">✈️ Road · ${r.gp} GP</div>
-          ${halfRow('H1', r.h1t, r.h1m)}
-          ${halfRow('H2', r.h2t, r.h2m)}
-          ${qRow('Q1', r.q1t, r.q1m)}
-          ${qRow('Q2', r.q2t, r.q2m)}
-          ${qRow('Q3', r.q3t, r.q3m)}
-          ${qRow('Q4', r.q4t, r.q4m)}
-        </div>
+        <div class="split-half"><div class="split-half-title">🏠 Home · ${h.gp} GP</div>
+          ${halfRow('H1',h.h1t,h.h1m)}${halfRow('H2',h.h2t,h.h2m)}
+          ${halfRow('Q1',h.q1t,h.q1m)}${halfRow('Q2',h.q2t,h.q2m)}
+          ${halfRow('Q3',h.q3t,h.q3m)}${halfRow('Q4',h.q4t,h.q4m)}</div>
+        <div class="split-half"><div class="split-half-title">✈️ Road · ${r.gp} GP</div>
+          ${halfRow('H1',r.h1t,r.h1m)}${halfRow('H2',r.h2t,r.h2m)}
+          ${halfRow('Q1',r.q1t,r.q1m)}${halfRow('Q2',r.q2t,r.q2m)}
+          ${halfRow('Q3',r.q3t,r.q3m)}${halfRow('Q4',r.q4t,r.q4m)}</div>
       </div>
       <div class="final-margin-row">
         <span class="fm-label">Final Margin</span>
         <div class="fm-vals">
           <div class="fm-item"><span>Home</span>${fmtM(h.fin)}</div>
           <div class="fm-item"><span>Road</span>${fmtM(r.fin)}</div>
-          <div class="fm-item"><span>H/R Diff</span><span class="${hrCls} hr-diff">${d.hrDiff >= 0 ? '+' : ''}${d.hrDiff.toFixed(1)}</span></div>
+          <div class="fm-item"><span>H/R Diff</span><span class="${hrCls} hr-diff">${d.hrDiff>=0?'+':''}${d.hrDiff.toFixed(1)}</span></div>
         </div>
-      </div>
-      ${flags}
+      </div>${flags}
     </div>`;
 }
 
 buildSplitsGrid();
-
+loadData();
 </script>
 </body>
 </html>
