@@ -127,9 +127,21 @@
   .rtg-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; }
   .rtg-search { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 7px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; width: 180px; margin-left: auto; }
   .rtg-search:focus { outline: none; border-color: var(--accent); }
-  .rtg-bar-wrap { position: relative; display: inline-block; min-width: 50px; }
-  .rtg-bar { position: absolute; left: 0; top: 0; bottom: 0; opacity: 0.12; pointer-events: none; }
-  .rtg-val { position: relative; }
+  .rtg-bar-wrap { position: relative; display: block; }
+  .rtg-bar { position: absolute; left: 0; top: 0; bottom: 0; opacity: 0.12; pointer-events: none; border-radius: 2px; }
+  .rtg-val { position: relative; display: block; }
+  #rtg-table { table-layout: fixed; }
+  #rtg-table th:nth-child(1) { width: 36px; }
+  #rtg-table th:nth-child(2) { width: 200px; text-align: left; }
+  #rtg-table th:nth-child(3) { width: 80px; }
+  #rtg-table th:nth-child(4) { width: 88px; }
+  #rtg-table th:nth-child(5) { width: 88px; }
+  #rtg-table th:nth-child(6) { width: 68px; }
+  #rtg-table th:nth-child(7) { width: 68px; }
+  #rtg-table th:nth-child(8) { width: 68px; }
+  #rtg-table th:nth-child(9) { width: 64px; }
+  #rtg-table th:nth-child(10){ width: 48px; }
+  #rtg-table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .badge-pos { color: var(--green); font-weight: 600; }
   .badge-neg { color: var(--red); font-weight: 600; }
 
@@ -252,16 +264,16 @@
       <div class="table-wrap">
         <table id="rtg-table">
           <thead><tr>
-            <th style="text-align:left;cursor:default">#</th>
+            <th style="text-align:left;cursor:default;width:36px">#</th>
             <th onclick="rtgSort('team')"     style="text-align:left">Team</th>
-            <th onclick="rtgSort('adj_net')"  class="sort-desc">Adj Net</th>
-            <th onclick="rtgSort('adj_ortg')">Adj ORTG</th>
-            <th onclick="rtgSort('adj_drtg')">Adj DRTG</th>
-            <th onclick="rtgSort('net')">Net</th>
-            <th onclick="rtgSort('ortg')">ORTG</th>
-            <th onclick="rtgSort('drtg')">DRTG</th>
-            <th onclick="rtgSort('pace')">Pace</th>
-            <th onclick="rtgSort('games')">GP</th>
+            <th onclick="rtgSort('adj_net')"  class="sort-desc" style="text-align:right">Adj Net</th>
+            <th onclick="rtgSort('adj_ortg')" style="text-align:right">Adj ORTG</th>
+            <th onclick="rtgSort('adj_drtg')" style="text-align:right">Adj DRTG</th>
+            <th onclick="rtgSort('net')"      style="text-align:right">Net</th>
+            <th onclick="rtgSort('ortg')"     style="text-align:right">ORTG</th>
+            <th onclick="rtgSort('drtg')"     style="text-align:right">DRTG</th>
+            <th onclick="rtgSort('pace')"     style="text-align:right">Pace</th>
+            <th onclick="rtgSort('games')"    style="text-align:right">GP</th>
           </tr></thead>
           <tbody id="rtg-body"><tr><td colspan="10" style="text-align:center;color:var(--muted);padding:2rem">Loading...</td></tr></tbody>
         </table>
@@ -509,18 +521,25 @@ function rtgDraw() {
     const ortg = RTG_ADJ ? r.adj_ortg : r.ortg;
     const drtg = RTG_ADJ ? r.adj_drtg : r.drtg;
     const netCls = net>0?'badge-pos':net<0?'badge-neg':'';
-    const op=(((ortg||0)/maxO)*100).toFixed(1), dp=(((drtg||0)/maxD)*100).toFixed(1);
+    const op=Math.min(100,(((ortg||0)/maxO)*100)).toFixed(1);
+    const dp=Math.min(100,(((drtg||0)/maxD)*100)).toFixed(1);
     return `<tr>
-      <td>${i+1}</td>
-      <td style="text-align:left;font-weight:700">${r.team}</td>
-      <td><span class="${netCls}">${net>0?'+':''}${net??0}</span></td>
-      <td class="rtg-bar-wrap"><div class="rtg-bar" style="width:${op}%;background:var(--accent2)"></div><span class="rtg-val" style="color:var(--accent2)">${ortg??0}</span></td>
-      <td class="rtg-bar-wrap"><div class="rtg-bar" style="width:${dp}%;background:var(--teal)"></div><span class="rtg-val" style="color:var(--teal)">${drtg??0}</span></td>
-      <td><span class="${r.net>0?'badge-pos':r.net<0?'badge-neg':''}">${r.net>0?'+':''}${r.net??0}</span></td>
-      <td style="color:var(--muted)">${r.ortg??0}</td>
-      <td style="color:var(--muted)">${r.drtg??0}</td>
-      <td style="color:var(--muted)">${r.pace??0}</td>
-      <td style="color:var(--muted)">${r.games??0}</td></tr>`;
+      <td style="color:var(--muted);font-size:12px">${i+1}</td>
+      <td style="text-align:left;font-weight:700;font-size:13px">${r.team}</td>
+      <td style="text-align:right"><span class="${netCls}">${net>0?'+':''}${net??0}</span></td>
+      <td style="text-align:right;position:relative">
+        <div class="rtg-bar" style="width:${op}%;background:var(--accent2)"></div>
+        <span style="position:relative;color:var(--accent2);font-weight:600">${ortg??0}</span>
+      </td>
+      <td style="text-align:right;position:relative">
+        <div class="rtg-bar" style="width:${dp}%;background:var(--teal)"></div>
+        <span style="position:relative;color:var(--teal);font-weight:600">${drtg??0}</span>
+      </td>
+      <td style="text-align:right"><span class="${r.net>0?'badge-pos':r.net<0?'badge-neg':''}">${r.net>0?'+':''}${r.net??0}</span></td>
+      <td style="text-align:right;color:var(--muted)">${r.ortg??0}</td>
+      <td style="text-align:right;color:var(--muted)">${r.drtg??0}</td>
+      <td style="text-align:right;color:var(--muted)">${r.pace??0}</td>
+      <td style="text-align:right;color:var(--muted)">${r.games??0}</td></tr>`;
   }).join('');
 
   const la=statsData.league_avg||{};
