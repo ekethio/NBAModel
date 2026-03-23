@@ -326,6 +326,27 @@ for g in all_game_stubs:
 for tid in team_game_stats:
     team_game_stats[tid].sort(key=lambda x: x['date'], reverse=True)
 
+def raw_ortg_drtg(tid):
+    """Raw (unadjusted) ratings for a team using full season data."""
+    rows = team_game_stats.get(tid, [])
+    if not rows: return 0.0, 0.0
+    tf=ta=tp=0.0
+    for r in rows:
+        tf+=r['pts_for']; ta+=r['pts_against']; tp+=r['poss']
+    if tp==0: return 0.0, 0.0
+    return round(tf/tp*100,1), round(ta/tp*100,1)
+
+# Pre-compute league averages ONCE (no recursion)
+_all_ortg=[]; _all_drtg=[]
+for _t in active_teams:
+    _o,_d = raw_ortg_drtg(_t['id'])
+    _all_ortg.append(_o); _all_drtg.append(_d)
+lg_ortg = round(sum(_all_ortg)/len(_all_ortg),1) if _all_ortg else 110.0
+lg_drtg = round(sum(_all_drtg)/len(_all_drtg),1) if _all_drtg else 110.0
+
+# Pre-compute each team's raw ratings for SOS lookup
+_team_raw = {_t['id']: raw_ortg_drtg(_t['id']) for _t in active_teams}
+
 def calc_ortg_drtg(tid, ng=None):
     rows = team_game_stats.get(tid, [])
     if ng: rows = rows[:ng]
@@ -337,36 +358,19 @@ def calc_ortg_drtg(tid, ng=None):
     ortg=round(tf/tp*100,1); drtg=round(ta/tp*100,1)
     avg_pace=round(sum(r['poss'] for r in rows)/len(rows),1)
 
-    # SOS adjustment: compare each opp's drtg/ortg to league avg
-    lo_=round(sum(calc_ortg_drtg(t['id'])['ortg'] for t in active_teams if t['id']!=tid)/max(len(active_teams)-1,1),1)
-    ld_=round(sum(calc_ortg_drtg(t['id'])['drtg'] for t in active_teams if t['id']!=tid)/max(len(active_teams)-1,1),1)
-    # Simple SOS: use season avg pts as proxy
+    # SOS adjustment using pre-computed raw ratings (no recursion)
     opp_drtg_list=[]; opp_ortg_list=[]
     for r in rows:
         oid=r['opp_id']
-        opp_rows=team_game_stats.get(oid,[])
-        if opp_rows:
-            o_tf=sum(x['pts_for'] for x in opp_rows); o_tp=sum(x['poss'] for x in opp_rows)
-            o_ta=sum(x['pts_against'] for x in opp_rows)
-            opp_drtg_list.append(round(o_ta/o_tp*100,1) if o_tp>0 else ld_)
-            opp_ortg_list.append(round(o_tf/o_tp*100,1) if o_tp>0 else lo_)
-        else:
-            opp_drtg_list.append(ld_); opp_ortg_list.append(lo_)
-    aod=sum(opp_drtg_list)/len(opp_drtg_list) if opp_drtg_list else ld_
-    aoo=sum(opp_ortg_list)/len(opp_ortg_list) if opp_ortg_list else lo_
-    adj_o=round(ortg*(ld_/aod),1) if aod>0 else ortg
-    adj_d=round(drtg*(lo_/aoo),1) if aoo>0 else drtg
+        o,d = _team_raw.get(oid, (lg_ortg, lg_drtg))
+        opp_ortg_list.append(o); opp_drtg_list.append(d)
+    aod=sum(opp_drtg_list)/len(opp_drtg_list) if opp_drtg_list else lg_drtg
+    aoo=sum(opp_ortg_list)/len(opp_ortg_list) if opp_ortg_list else lg_ortg
+    adj_o=round(ortg*(lg_drtg/aod),1) if aod>0 else ortg
+    adj_d=round(drtg*(lg_ortg/aoo),1) if aoo>0 else drtg
     return {'ortg':ortg,'drtg':drtg,'net':round(ortg-drtg,1),
             'adj_ortg':adj_o,'adj_drtg':adj_d,'adj_net':round(adj_o-adj_d,1),
             'pace':avg_pace,'games':len(rows)}
-
-# League avg for display
-all_ortg=[]; all_drtg=[]
-for t in active_teams:
-    s=calc_ortg_drtg(t['id'])
-    all_ortg.append(s['ortg']); all_drtg.append(s['drtg'])
-lg_ortg=round(sum(all_ortg)/len(all_ortg),1) if all_ortg else 0
-lg_drtg=round(sum(all_drtg)/len(all_drtg),1) if all_drtg else 0
 
 ratings = {}
 mgp = max(len(team_game_stats.get(t['id'],[])) for t in active_teams) if active_teams else 0
