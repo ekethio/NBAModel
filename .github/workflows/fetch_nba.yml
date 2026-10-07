@@ -27,7 +27,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests
+        run: pip install nba_api
 
       - name: Run NBA fetch script
         run: python fetch_nba.py
