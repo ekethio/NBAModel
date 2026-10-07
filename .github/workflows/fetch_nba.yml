@@ -1,9 +1,9 @@
 name: Fetch NBA Stats
 
 on:
-  # Run every day at 11pm Pacific (7am UTC next day)
+  # Run once a week, Sunday 11pm Pacific (Monday 7am UTC)
   schedule:
-    - cron: '0 7 * * *'
+    - cron: '0 7 * * 1'
   # Run automatically whenever fetch_nba.py is updated
   push:
     paths:
@@ -27,7 +27,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install nba_api
+        run: pip install requests
 
       - name: Run NBA fetch script
         run: python fetch_nba.py
