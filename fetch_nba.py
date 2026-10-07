@@ -1,82 +1,91 @@
 import json
 import os
+import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
-from nba_api.stats.endpoints import leaguegamelog
+from nba_api.live.nba.endpoints import boxscore
 
 SEASON            = os.environ.get('NBA_SEASON', '2025-26')
 POINTS_THRESHOLD  = 228
 OUTPUT_FILE       = 'data/nba_stats.json'
 
-# Optional HTTP(S) proxy for stats.nba.com, which sometimes blocks cloud IPs
+# stats.nba.com times out from cloud runners such as GitHub Actions, so box
+# scores come from nba_api's live endpoints, which are served by cdn.nba.com.
+# Optional HTTP(S) proxy in case cdn.nba.com is ever blocked too.
 PROXY   = os.environ.get('NBA_API_PROXY') or None
-TIMEOUT = 60
+TIMEOUT = 30
+WORKERS = 8
 
-def fetch_team_game_log(retries=4, delay=10):
-    """One row per team per game for the regular season, with box score totals."""
-    for i in range(retries):
-        try:
-            log = leaguegamelog.LeagueGameLog(
-                season=SEASON,
-                season_type_all_star='Regular Season',
-                player_or_team_abbreviation='T',
-                proxy=PROXY,
-                timeout=TIMEOUT,
-            )
-            return log.get_normalized_dict()['LeagueGameLog']
-        except Exception as e:
-            if i == retries - 1:
-                raise
-            print(f"  Retry {i+1} ({e}), waiting {delay}s...")
-            time.sleep(delay)
-
-print(f"Fetching {SEASON} team game logs from stats.nba.com...")
-log_rows = fetch_team_game_log()
-
-# Pair up the two team rows of each game
-games_by_id = {}
-for r in log_rows:
-    if r.get('PTS') is None or not r.get('WL'):
-        continue  # game not completed
-    games_by_id.setdefault(r['GAME_ID'], []).append(r)
+# Regular season game IDs are 002 + season start year (2 digits) + 00001..01230
+REG_SEASON_GAMES = 1230
+SEASON_PREFIX    = f"002{SEASON[2:4]}"
 
 # Keep team names consistent with the names the dashboard expects
 TEAM_NAME_FIX = {'Los Angeles Clippers': 'LA Clippers'}
 
-all_game_stubs = []
-game_rows      = {}   # gid -> (home_row, away_row)
-for gid, rows in games_by_id.items():
-    if len(rows) != 2:
-        continue
-    home = next((r for r in rows if ' vs. ' in r['MATCHUP']), None)
-    away = next((r for r in rows if ' @ '   in r['MATCHUP']), None)
-    if not home or not away:
-        continue
-    game_rows[gid] = (home, away)
-    all_game_stubs.append({
-        'id':         gid,
-        'date':       home['GAME_DATE'][:10],
-        'home_id':    str(home['TEAM_ID']),
-        'home_name':  TEAM_NAME_FIX.get(home['TEAM_NAME'], home['TEAM_NAME']),
-        'home_abbr':  home['TEAM_ABBREVIATION'],
-        'home_score': int(home['PTS']),
-        'away_id':    str(away['TEAM_ID']),
-        'away_name':  TEAM_NAME_FIX.get(away['TEAM_NAME'], away['TEAM_NAME']),
-        'away_abbr':  away['TEAM_ABBREVIATION'],
-        'away_score': int(away['PTS']),
-    })
-all_game_stubs.sort(key=lambda g: (g['date'], g['id']))
+def fetch_box(gid, retries=3, delay=3):
+    """Final box score for a game, or None if it hasn't been played."""
+    for i in range(retries):
+        try:
+            game = boxscore.BoxScore(gid, proxy=PROXY, timeout=TIMEOUT).get_dict().get('game', {})
+            return game if game.get('gameStatus') == 3 else None
+        except ValueError:
+            return None  # cdn.nba.com has no box score yet (non-JSON error page)
+        except Exception as e:
+            if i == retries - 1:
+                print(f"  Box score failed for {gid}: {e}")
+                return None
+            time.sleep(delay)
 
-print(f"  Found {len(all_game_stubs)} completed games")
-if not all_game_stubs:
-    raise RuntimeError(f"No games found for season {SEASON}")
+def team_name(t):
+    name = f"{t.get('teamCity', '')} {t.get('teamName', '')}".strip()
+    return TEAM_NAME_FIX.get(name, name)
 
 def num(v):
     try:
         return float(v)
     except (TypeError, ValueError):
         return 0.0
+
+def team_minutes(v):
+    """'PT240M00.00S' -> 240.0"""
+    m = re.match(r'PT(\d+)M([\d.]+)S', str(v or ''))
+    return int(m.group(1)) + float(m.group(2))/60 if m else num(v)
+
+print(f"Fetching {SEASON} box scores from cdn.nba.com...")
+game_ids = [f"{SEASON_PREFIX}{n:05d}" for n in range(1, REG_SEASON_GAMES + 1)]
+with ThreadPoolExecutor(max_workers=WORKERS) as pool:
+    boxes = list(pool.map(fetch_box, game_ids))
+
+all_game_stubs = []
+game_rows      = {}   # gid -> (home_stats, away_stats)
+for gid, game in zip(game_ids, boxes):
+    if not game:
+        continue
+    home, away = game.get('homeTeam', {}), game.get('awayTeam', {})
+    hs, as_ = int(num(home.get('score'))), int(num(away.get('score')))
+    if hs == 0 and as_ == 0:
+        continue
+    game_rows[gid] = (home.get('statistics', {}), away.get('statistics', {}))
+    all_game_stubs.append({
+        'id':         gid,
+        'date':       (game.get('gameEt') or game.get('gameTimeUTC') or '')[:10],
+        'home_id':    str(home['teamId']),
+        'home_name':  team_name(home),
+        'home_abbr':  home.get('teamTricode', ''),
+        'home_score': hs,
+        'away_id':    str(away['teamId']),
+        'away_name':  team_name(away),
+        'away_abbr':  away.get('teamTricode', ''),
+        'away_score': as_,
+    })
+all_game_stubs.sort(key=lambda g: (g['date'], g['id']))
+
+print(f"  Found {len(all_game_stubs)} completed games")
+if not all_game_stubs:
+    raise RuntimeError(f"No games found for season {SEASON}")
 
 print("Computing pace from box scores...")
 game_pace       = {}
@@ -88,10 +97,12 @@ for g in all_game_stubs:
     game_totals[gid] = g['home_score'] + g['away_score']
 
     td = []
-    for r in game_rows[gid]:
-        td.append({'fga':num(r['FGA']),'fgm':num(r['FGM']),'fta':num(r['FTA']),'ftm':num(r['FTM']),
-                   'oreb':num(r['OREB']),'dreb':num(r['DREB']),'tov':num(r['TOV']),
-                   'pf':num(r['PF']),'min':num(r['MIN'])})
+    for st in game_rows[gid]:
+        td.append({'fga':num(st.get('fieldGoalsAttempted')),'fgm':num(st.get('fieldGoalsMade')),
+                   'fta':num(st.get('freeThrowsAttempted')),'ftm':num(st.get('freeThrowsMade')),
+                   'oreb':num(st.get('reboundsOffensive')),'dreb':num(st.get('reboundsDefensive')),
+                   'tov':num(st.get('turnoversTotal', st.get('turnovers'))),
+                   'pf':num(st.get('foulsPersonal')),'min':team_minutes(st.get('minutes'))})
 
     # Store box stats for fouls/FTA tab
     game_box[gid] = {
