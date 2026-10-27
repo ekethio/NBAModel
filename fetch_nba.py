@@ -4,12 +4,13 @@ import os
 import time
 from datetime import datetime, date, timedelta
 
-SEASON            = '2025-26'
+SEASON            = '2026-27'
 POINTS_THRESHOLD  = 228
 OUTPUT_FILE       = 'data/nba_stats.json'
 
-SEASON_START = date(2025, 10, 21)
-SEASON_END   = date(2026, 4, 15)
+# Scan from Oct 1; preseason games are skipped by the season-type check below
+SEASON_START = date(2026, 10, 1)
+SEASON_END   = date(2027, 4, 18)
 
 BASE    = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba'
 SUMMARY = 'https://site.web.api.espn.com/apis/site/v2/sports/basketball/nba/summary'

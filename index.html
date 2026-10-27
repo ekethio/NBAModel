@@ -245,7 +245,7 @@
 
     <!-- SPLITS -->
     <div class="tab-panel" id="tab-splits">
-      <div class="section-header"><h2>Team Splits</h2><div class="line"></div><div class="tag">2025-26 Season</div></div>
+      <div class="section-header"><h2>Team Splits</h2><div class="line"></div><div class="tag">2026-27 Season</div></div>
       <div class="team-grid" id="splits-team-grid"></div>
       <div id="splits-output"><div id="splits-placeholder">Select a team above to view splits</div></div>
     </div>
@@ -357,7 +357,7 @@ function renderAll() {
   document.getElementById('updated-time').textContent = d.updatedAt || d.updated || '—';
   document.getElementById('status-bar').innerHTML = `
     <div class="stat-pill"><span class="label">Teams</span><span class="val">${(d.pointsData||[]).length||30}</span></div>
-    <div class="stat-pill"><span class="label">Season</span><span class="val">${d.season||'2025-26'}</span></div>
+    <div class="stat-pill"><span class="label">Season</span><span class="val">${d.season||'2026-27'}</span></div>
     <div class="stat-pill"><span class="label">O/U Line</span><span class="val">${d.pointsThreshold||228}</span></div>
     <div class="stat-pill"><span class="label">Updated</span><span class="val">${d.updatedAt||d.updated||'—'}</span></div>`;
 
@@ -722,7 +722,7 @@ function showSplits(name, btn) {
   const flags = d.flags.length ? `<div class="special-flags">${d.flags.map(f=>{const cls=f.startsWith('HOME')?'home-flag':'road-flag';return`<span class="flag ${cls}">⚑ ${f}</span>`;}).join('')}</div>` : '';
   document.getElementById('splits-output').innerHTML = `
     <div class="splits-card">
-      <div class="splits-card-header"><h3>${name}</h3><div class="meta">2025-26 · ${h.gp} Home / ${r.gp} Road games</div></div>
+      <div class="splits-card-header"><h3>${name}</h3><div class="meta">2026-27 · ${h.gp} Home / ${r.gp} Road games</div></div>
       <div class="splits-grid">
         <div class="split-half"><div class="split-half-title">🏠 Home · ${h.gp} GP</div>
           ${halfRow('H1',h.h1t,h.h1m)}${halfRow('H2',h.h2t,h.h2m)}
