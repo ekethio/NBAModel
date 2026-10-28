@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 
 SEASON_START   = date(2026, 10, 1)
 THRESHOLD      = 0.8    # seconds of time-to-shot shift, required in each of the last two games
-BASELINE_GAMES = 10     # games before the last two
+MODELS         = {'A': 10, 'B': 6}   # model name -> baseline games before the last two
 GAMES_FILE     = 'data/tempo_games.json'
 PICKS_FILE     = 'data/picks.json'
 
@@ -123,7 +123,7 @@ def game_tts(summary):
 
 # ── Scan the schedule ───────────────────────────────────────────────────────
 games = load(GAMES_FILE, {})
-picks = load(PICKS_FILE, {'history': []})
+picks = load(PICKS_FILE, {})
 today = datetime.now(ET).date()
 
 last_cached = max((date.fromisoformat(g['date']) for g in games.values()), default=SEASON_START)
@@ -173,7 +173,7 @@ with open(GAMES_FILE, 'w') as f:
     json.dump(games, f, separators=(',', ':'))
 print(f"  {sum('tts' in g for g in games.values())} games with time to shot; {len(upcoming)} games still to play today")
 
-# ── Shifts: each of the last two games vs the 10 before them ────────────────
+# ── Shifts: each of the last two games vs the games before them ─────────────
 log = {}
 for gid, g in games.items():
     for team, v in g.get('tts', {}).items():
@@ -181,65 +181,66 @@ for gid, g in games.items():
 for team in log:
     log[team].sort()
 
-def shift_direction(team):
+def shift_direction(team, n):
     hist = log.get(team, [])
-    if len(hist) < BASELINE_GAMES + 2:
+    if len(hist) < n + 2:
         return 0, None
-    base = sum(x[2] for x in hist[-BASELINE_GAMES - 2:-2]) / BASELINE_GAMES
+    base = sum(x[2] for x in hist[-n - 2:-2]) / n
     d1, d2 = hist[-1][2] - base, hist[-2][2] - base
     if d1 <= -THRESHOLD and d2 <= -THRESHOLD:
-        return 1, (d1, d2)        # faster: over
+        return 1, (round(d1, 2), round(d2, 2))     # faster: over
     if d1 >= THRESHOLD and d2 >= THRESHOLD:
-        return -1, (d1, d2)       # slower: under
-    return 0, (d1, d2)
+        return -1, (round(d1, 2), round(d2, 2))    # slower: under
+    return 0, (round(d1, 2), round(d2, 2))
 
 lg = [v['tts'] for g in games.values() for v in g.get('tts', {}).values()]
 if lg:
     print(f"  League time to shot so far: {sum(lg) / len(lg):.2f} s over {len(lg)} team-games")
-ready = sum(len(v) >= BASELINE_GAMES + 2 for v in log.values())
-print(f"  Teams with enough games for a baseline: {ready} of {len(log)}")
 
-history = {p['id']: p for p in picks.get('history', [])}
+def grade(history):
+    for p in history.values():
+        g = games.get(p['id'])
+        if g is None or p.get('result') or not (g['home_score'] or g['away_score']):
+            continue
+        total = g['home_score'] + g['away_score']
+        p['final'] = total
+        if p.get('line') is None:
+            p['result'] = 'No line'
+        elif total == p['line']:
+            p['result'] = 'P'
+        else:
+            p['result'] = 'W' if (total > p['line']) == (p['side'] == 'Over') else 'L'
+
 now = datetime.now(ET).strftime('%Y-%m-%d %H:%M ET')
-for g in upcoming:
-    dh, sh = shift_direction(g['home'])
-    da, sa = shift_direction(g['away'])
-    print(f"  {g['away']} @ {g['home']}: {g['away']} {sa} {da:+d}, {g['home']} {sh} {dh:+d}")
-    if dh * da < 0 or dh + da == 0:
-        continue
-    side = 'Over' if dh + da > 0 else 'Under'
-    p = history.get(g['id'])
-    if p is None:
-        history[g['id']] = {'id': g['id'], 'date': g['date'], 'tip': g['tip'],
-                            'matchup': f"{g['away']} @ {g['home']}", 'side': side,
-                            'line': g['line'], 'posted': now}
-    elif p.get('line') is None and g['line'] is not None:
-        p['line'] = g['line']
+old = picks.get('models', {'A': {'history': picks.get('history', [])}})   # older files held one model
+models = {}
+for name, n in MODELS.items():
+    ready = sum(len(v) >= n + 2 for v in log.values())
+    print(f"Model {name}: teams with enough games: {ready} of {len(log)}")
+    history = {p['id']: p for p in old.get(name, {}).get('history', [])}
+    for g in upcoming:
+        dh, sh = shift_direction(g['home'], n)
+        da, sa = shift_direction(g['away'], n)
+        if dh or da:
+            print(f"  {g['away']} @ {g['home']}: {g['away']} {sa} {da:+d}, {g['home']} {sh} {dh:+d}")
+        if dh * da < 0 or dh + da == 0:
+            continue
+        side = 'Over' if dh + da > 0 else 'Under'
+        p = history.get(g['id'])
+        if p is None:
+            history[g['id']] = {'id': g['id'], 'date': g['date'], 'tip': g['tip'],
+                                'matchup': f"{g['away']} @ {g['home']}", 'side': side,
+                                'line': g['line'], 'posted': now}
+        elif p.get('line') is None and g['line'] is not None:
+            p['line'] = g['line']
+    grade(history)
+    hist = sorted(history.values(), key=lambda p: (p['date'], p['tip']), reverse=True)
+    w = sum(p.get('result') == 'W' for p in hist)
+    l = sum(p.get('result') == 'L' for p in hist)
+    pu = sum(p.get('result') == 'P' for p in hist)
+    models[name] = {'record': {'w': w, 'l': l, 'p': pu, 'units': round(w * 100 / 110 - l, 2)}, 'history': hist}
+    print(f"  {sum(p['date'] == today.isoformat() for p in hist)} bets today, record {w}-{l}-{pu}")
 
-# ── Grade finished bets ─────────────────────────────────────────────────────
-for p in history.values():
-    g = games.get(p['id'])
-    if g is None or p.get('result') or not (g['home_score'] or g['away_score']):
-        continue
-    total = g['home_score'] + g['away_score']
-    p['final'] = total
-    if p.get('line') is None:
-        p['result'] = 'No line'
-    elif total == p['line']:
-        p['result'] = 'P'
-    else:
-        p['result'] = 'W' if (total > p['line']) == (p['side'] == 'Over') else 'L'
-
-hist = sorted(history.values(), key=lambda p: (p['date'], p['tip']), reverse=True)
-w = sum(p.get('result') == 'W' for p in hist)
-l = sum(p.get('result') == 'L' for p in hist)
-pu = sum(p.get('result') == 'P' for p in hist)
-out = {
-    'updatedAt': now,
-    'today':     today.isoformat(),
-    'record':    {'w': w, 'l': l, 'p': pu, 'units': round(w * 100 / 110 - l, 2)},
-    'history':   hist,
-}
 with open(PICKS_FILE, 'w') as f:
-    json.dump(out, f, indent=1)
-print(f"Saved {PICKS_FILE}: {sum(p['date'] == today.isoformat() for p in hist)} bets today, record {w}-{l}-{pu}")
+    json.dump({'updatedAt': now, 'today': today.isoformat(), 'models': models}, f, indent=1)
+print(f"Saved {PICKS_FILE}")

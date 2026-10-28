@@ -39,6 +39,9 @@
   .W { color: var(--win); font-weight: 500; } .L { color: var(--loss); font-weight: 500; } .P, .pending { color: var(--muted); }
   .empty { padding: 18px 14px; color: var(--muted); font-size: 12px; }
   .note { font-size: 11px; color: var(--muted); line-height: 1.8; }
+  .models { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  .model-tab { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; padding: 10px 20px; border: none; background: transparent; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .model-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 </style>
 </head>
 <body>
@@ -48,6 +51,8 @@
     <h1>NBA Totals <span>Bets</span></h1>
     <a class="back" href="index.html">← Team analytics</a>
   </header>
+
+  <div class="models" id="models"></div>
 
   <div class="record">
     <div class="tile"><div class="label">Record</div><div class="val" id="rec">—</div></div>
@@ -74,14 +79,15 @@ function table(rows, cols) {
 }
 const bet = (p) => `<span class="${p.side.toLowerCase()}">${esc(p.side)}</span>`;
 const line = (p) => p.line == null ? 'TBD' : esc(p.line);
-fetch('data/picks.json?' + Date.now()).then((r) => r.json()).then((d) => {
-  const { w, l, p, units } = d.record;
+let DATA = null, MODEL = 'A';
+function draw() {
+  const m = DATA.models[MODEL] || { record: { w: 0, l: 0, p: 0, units: 0 }, history: [] };
+  const { w, l, p, units } = m.record;
   document.getElementById('rec').textContent = `${w}-${l}${p ? '-' + p : ''}`;
   document.getElementById('pct').textContent = w + l ? (100 * w / (w + l)).toFixed(1) + '%' : '—';
   document.getElementById('units').textContent = (units > 0 ? '+' : '') + units.toFixed(2);
-  document.getElementById('updated').textContent = d.updatedAt;
-  const today = d.history.filter((x) => x.date === d.today);
-  const past = d.history.filter((x) => x.date !== d.today);
+  const today = m.history.filter((x) => x.date === DATA.today);
+  const past = m.history.filter((x) => x.date !== DATA.today);
   document.getElementById('today').innerHTML = table(today, [
     ['Game', (x) => esc(x.matchup)], ['Tip', (x) => fmtTip(x.tip)], ['Bet', bet], ['Line', line],
     ['Result', (x) => x.result ? `<span class="${x.result}">${esc(x.result)} (${x.final})</span>` : '<span class="pending">Pending</span>'],
@@ -90,6 +96,19 @@ fetch('data/picks.json?' + Date.now()).then((r) => r.json()).then((d) => {
     ['Date', (x) => fmtDate(x.date)], ['Game', (x) => esc(x.matchup)], ['Bet', bet], ['Line', line],
     ['Final', (x) => x.final ?? '—'], ['Result', (x) => `<span class="${x.result || 'pending'}">${esc(x.result || 'Pending')}</span>`],
   ]) || '<div class="empty">No past bets yet.</div>';
+  document.querySelectorAll('.model-tab').forEach((b) => b.classList.toggle('active', b.dataset.m === MODEL));
+}
+fetch('data/picks.json?' + Date.now()).then((r) => r.json()).then((d) => {
+  DATA = d.models ? d : { ...d, models: { A: { record: d.record, history: d.history } } };
+  document.getElementById('updated').textContent = DATA.updatedAt;
+  const tabs = document.getElementById('models');
+  Object.keys(DATA.models).sort().forEach((k) => {
+    const b = document.createElement('button');
+    b.className = 'model-tab'; b.dataset.m = k; b.type = 'button'; b.textContent = 'Model ' + k;
+    b.addEventListener('click', () => { MODEL = k; draw(); });
+    tabs.appendChild(b);
+  });
+  draw();
 }).catch(() => { document.getElementById('today').innerHTML = '<div class="empty">Bets unavailable right now.</div>'; });
 </script>
 </body>
