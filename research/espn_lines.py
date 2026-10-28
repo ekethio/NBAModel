@@ -42,13 +42,20 @@ def total_of(block):
 
 ids = [r['game_id'] for r in csv.DictReader(open('research/espn_game_ids.csv'))]
 if limit:
-    ids = ids[:limit]
+    # sample games spread across all five seasons
+    step = max(1, len(ids) // limit)
+    ids = ids[step // 2::step][:limit]
 rows = []
 for k, gid in enumerate(ids):
     data = get(CORE.format(gid))
     items = (data or {}).get('items', [])
-    if limit and k == 0 and items:
-        print(json.dumps(items[0], indent=1)[:4000])
+    if limit:
+        keyed = [((it.get('provider') or {}).get('name'), sorted(k for k in it if k in ('open', 'close', 'current'))) for it in items]
+        print(gid, keyed)
+        withopen = [it for it in items if 'open' in it]
+        if withopen and not getattr(sys, '_shown', False):
+            print(json.dumps({k: withopen[0][k] for k in ('provider', 'overUnder', 'open', 'close', 'current') if k in withopen[0]}, indent=1)[:3000])
+            sys._shown = True
     for it in items:
         rows.append({'game_id': gid, 'provider': (it.get('provider') or {}).get('name'),
                      'over_under': it.get('overUnder'),
