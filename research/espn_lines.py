@@ -23,21 +23,18 @@ def get(url):
             time.sleep(3 * (i + 1))
     return None
 
-def num(x):
-    m = re.search(r'(\d{3}(?:\.\d)?)', str(x or ''))
-    return float(m.group(1)) if m else None
-
 def total_of(block):
-    # a block like item['open'] / item['close']; the total sits under 'total' or as over/under lines
-    if not isinstance(block, dict):
+    # a block like item['open'] / item['close']; only accept a plausible game total
+    t = (block or {}).get('total') if isinstance(block, dict) else None
+    if not isinstance(t, dict):
         return None
-    for key in ('total', 'over', 'under'):
-        v = block.get(key)
-        if isinstance(v, dict):
-            for k in ('value', 'line', 'alternateDisplayValue', 'displayValue', 'american'):
-                n = num(v.get(k))
-                if n:
-                    return n
+    for k in ('value', 'alternateDisplayValue', 'american'):
+        try:
+            v = float(str(t.get(k)).lstrip('ou'))
+        except (TypeError, ValueError):
+            continue
+        if 170 <= v <= 300:
+            return v
     return None
 
 ids = [r['game_id'] for r in csv.DictReader(open('research/espn_game_ids.csv'))]
