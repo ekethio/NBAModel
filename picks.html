@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NBA Totals Bets</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #f5f7fa; --surface: #ffffff; --surface2: #eef1f6;
+    --border: #d0d8e4; --accent: #1a6ef5; --accent2: #e05c20;
+    --text: #1a2235; --muted: #6b7a99; --win: #1f8a5b; --loss: #c2453d;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f141c; --surface: #161d28; --surface2: #1d2533; --border: #2a3444;
+            --accent: #5b9bff; --text: #e6ecf5; --muted: #8e9bb3; --win: #4cc38a; --loss: #ef7a70; }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Mono', monospace; min-height: 100vh; }
+  .wrapper { max-width: 900px; margin: 0 auto; padding: 0 16px 48px; }
+  header { padding: 36px 0 24px; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+  .eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 4px; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+  h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
+  h1 span { color: var(--accent); }
+  .back { display: inline-block; margin-top: 10px; font-size: 11px; color: var(--muted); text-decoration: none; letter-spacing: 1px; }
+  .back:hover { color: var(--accent); }
+  .record { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .tile { background: var(--surface); border: 1px solid var(--border); padding: 14px 16px; }
+  .tile .label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; }
+  .tile .val { font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 12px; }
+  .card { background: var(--surface); border: 1px solid var(--border); margin-bottom: 28px; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  th { text-align: left; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  .over { color: var(--accent); font-weight: 500; }
+  .under { color: var(--accent2); font-weight: 500; }
+  .W { color: var(--win); font-weight: 500; } .L { color: var(--loss); font-weight: 500; } .P, .pending { color: var(--muted); }
+  .empty { padding: 18px 14px; color: var(--muted); font-size: 12px; }
+  .note { font-size: 11px; color: var(--muted); line-height: 1.8; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <header>
+    <div class="eyebrow">Updated daily</div>
+    <h1>NBA Totals <span>Bets</span></h1>
+    <a class="back" href="index.html">← Team analytics</a>
+  </header>
+
+  <div class="record">
+    <div class="tile"><div class="label">Record</div><div class="val" id="rec">—</div></div>
+    <div class="tile"><div class="label">Win rate</div><div class="val" id="pct">—</div></div>
+    <div class="tile"><div class="label">Units (−110)</div><div class="val" id="units">—</div></div>
+  </div>
+
+  <h2>Today</h2>
+  <div class="card"><div id="today"></div></div>
+
+  <h2>History</h2>
+  <div class="card"><div id="history"></div></div>
+
+  <p class="note">Bets are posted before tip-off and graded against the line shown when posted. One unit per bet. Last updated <span id="updated">—</span>.</p>
+</div>
+<script>
+const fmtTip = (iso) => iso ? new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
+const fmtDate = (d) => new Date(d + 'T12:00:00').toLocaleDateString([], { month: 'short', day: 'numeric' });
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function table(rows, cols) {
+  if (!rows.length) return '';
+  return '<table><thead><tr>' + cols.map((c) => `<th>${c[0]}</th>`).join('') + '</tr></thead><tbody>' +
+    rows.map((r) => '<tr>' + cols.map((c) => `<td>${c[1](r)}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
+}
+const bet = (p) => `<span class="${p.side.toLowerCase()}">${esc(p.side)}</span>`;
+const line = (p) => p.line == null ? 'TBD' : esc(p.line);
+fetch('data/picks.json?' + Date.now()).then((r) => r.json()).then((d) => {
+  const { w, l, p, units } = d.record;
+  document.getElementById('rec').textContent = `${w}-${l}${p ? '-' + p : ''}`;
+  document.getElementById('pct').textContent = w + l ? (100 * w / (w + l)).toFixed(1) + '%' : '—';
+  document.getElementById('units').textContent = (units > 0 ? '+' : '') + units.toFixed(2);
+  document.getElementById('updated').textContent = d.updatedAt;
+  const today = d.history.filter((x) => x.date === d.today);
+  const past = d.history.filter((x) => x.date !== d.today);
+  document.getElementById('today').innerHTML = table(today, [
+    ['Game', (x) => esc(x.matchup)], ['Tip', (x) => fmtTip(x.tip)], ['Bet', bet], ['Line', line],
+    ['Result', (x) => x.result ? `<span class="${x.result}">${esc(x.result)} (${x.final})</span>` : '<span class="pending">Pending</span>'],
+  ]) || '<div class="empty">No bets today.</div>';
+  document.getElementById('history').innerHTML = table(past, [
+    ['Date', (x) => fmtDate(x.date)], ['Game', (x) => esc(x.matchup)], ['Bet', bet], ['Line', line],
+    ['Final', (x) => x.final ?? '—'], ['Result', (x) => `<span class="${x.result || 'pending'}">${esc(x.result || 'Pending')}</span>`],
+  ]) || '<div class="empty">No past bets yet.</div>';
+}).catch(() => { document.getElementById('today').innerHTML = '<div class="empty">Bets unavailable right now.</div>'; });
+</script>
+</body>
+</html>
