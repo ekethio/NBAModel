@@ -38,6 +38,8 @@
   .under { color: var(--accent2); font-weight: 500; }
   .W { color: var(--win); font-weight: 500; } .L { color: var(--loss); font-weight: 500; } .P, .pending { color: var(--muted); }
   .empty { padding: 18px 14px; color: var(--muted); font-size: 12px; }
+  .pass { color: var(--muted); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; margin-left: 6px; }
+  tr.passed td { opacity: .6; }
   .note { font-size: 11px; color: var(--muted); line-height: 1.8; }
   .models { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
   .model-tab { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; padding: 10px 20px; border: none; background: transparent; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
@@ -58,6 +60,7 @@
     <div class="tile"><div class="label">Record</div><div class="val" id="rec">—</div></div>
     <div class="tile"><div class="label">Win rate</div><div class="val" id="pct">—</div></div>
     <div class="tile"><div class="label">Units (−110)</div><div class="val" id="units">—</div></div>
+    <div class="tile"><div class="label">Passed bets</div><div class="val" id="passed">—</div></div>
   </div>
 
   <h2>Today</h2>
@@ -66,7 +69,7 @@
   <h2>History</h2>
   <div class="card"><div id="history"></div></div>
 
-  <p class="note">Bets are posted before tip-off and graded against the line shown when posted. One unit per bet. Last updated <span id="updated">—</span>.</p>
+  <p class="note">Bets are posted before tip-off and graded against the line shown when posted. One unit per bet. Bets marked Pass are graded but not counted in the record. Last updated <span id="updated">—</span>.</p>
 </div>
 <script>
 const fmtTip = (iso) => iso ? new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
@@ -75,9 +78,9 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
 function table(rows, cols) {
   if (!rows.length) return '';
   return '<table><thead><tr>' + cols.map((c) => `<th>${c[0]}</th>`).join('') + '</tr></thead><tbody>' +
-    rows.map((r) => '<tr>' + cols.map((c) => `<td>${c[1](r)}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
+    rows.map((r) => `<tr${r.passed ? ' class="passed"' : ''}>` + cols.map((c) => `<td>${c[1](r)}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
 }
-const bet = (p) => `<span class="${p.side.toLowerCase()}">${esc(p.side)}</span>`;
+const bet = (p) => `<span class="${p.side.toLowerCase()}">${esc(p.side)}</span>${p.passed ? '<span class="pass">Pass</span>' : ''}`;
 const line = (p) => p.line == null ? 'TBD' : esc(p.line);
 let DATA = null, MODEL = 'A';
 function draw() {
@@ -86,6 +89,8 @@ function draw() {
   document.getElementById('rec').textContent = `${w}-${l}${p ? '-' + p : ''}`;
   document.getElementById('pct').textContent = w + l ? (100 * w / (w + l)).toFixed(1) + '%' : '—';
   document.getElementById('units').textContent = (units > 0 ? '+' : '') + units.toFixed(2);
+  const pr = m.passed_record || { w: 0, l: 0, p: 0 };
+  document.getElementById('passed').textContent = `${pr.w}-${pr.l}${pr.p ? '-' + pr.p : ''}`;
   const today = m.history.filter((x) => x.date === DATA.today);
   const past = m.history.filter((x) => x.date !== DATA.today);
   document.getElementById('today').innerHTML = table(today, [
