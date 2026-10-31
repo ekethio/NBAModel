@@ -7,6 +7,9 @@ rebound, after a steal, after a dead-ball turnover. Each team's time to shot in 
 with the league's for that group this season, small groups are shrunk toward the team's overall gap,
 and the groups are recombined with league-wide weights, so a game full of steals doesn't read as fast
 just because it had more transition chances. The league reference is cached in research/league_mix.json.
+
+The clock stops at the first field-goal attempt, or, for possessions with no attempt, at a shooting foul or a
+shot-clock violation, so possessions that never record a shot still count. Bonus fouls are left out.
 """
 import json
 import os
@@ -23,8 +26,21 @@ GROUPS = ('made', 'dreb', 'steal', 'deadtov')
 CACHE = 'research/league_mix.json'
 
 
-def possessions(summary):
-    """[(team abbreviation, start group, tts)] for possessions that count, same rules as the bets page."""
+def ends_shot(r, extended):
+    """The event that stops the time-to-shot clock: a field-goal attempt; with extended, also a shooting foul
+    (a shot the box score doesn't count) and a shot-clock violation. Bonus fouls are left out: when they come
+    says little about the offense and they pile up late in quarters."""
+    ft = 'free throw' in r['typ'] or 'free throw' in r['txt']
+    if r['shot'] and not ft:
+        return True
+    if not extended:
+        return False
+    return 'shooting foul' in r['typ'] or 'shot clock' in r['typ'] or 'shot clock' in r['txt']
+
+
+def possessions(summary, extended=True):
+    """[(team abbreviation, start group, tts)] for possessions that count. extended=True also ends the clock at
+    shooting fouls and shot-clock violations; extended=False matches the bets page."""
     comp = summary['header']['competitions'][0]
     abbr = {c['team']['id']: c['team']['abbreviation'] for c in comp['competitors']}
     plays = sorted(summary.get('plays', []), key=lambda p: int(p.get('sequenceNumber', 0)))
@@ -68,8 +84,11 @@ def possessions(summary):
         end_i = min(bounds[k + 1][0] + 1, len(rows)) if k + 1 < len(bounds) else len(rows)
         per = rows[i]['per']
         offense = who if kind == 'dreb' else (next((t for t in teams if t != who), None) if kind in ('made', 'tov') else None)
-        fga = next((rows[j] for j in range(i + 1, end_i) if rows[j]['per'] == per and rows[j]['shot']
-                    and 'free throw' not in rows[j]['typ'] and 'free throw' not in rows[j]['txt']), None)
+        fga = next((rows[j] for j in range(i + 1, end_i) if rows[j]['per'] == per and ends_shot(rows[j], extended)), None)
+        if fga is not None and 'shooting foul' in fga['typ']:   # fouls are logged to the defense
+            fga = dict(fga, team=offense or next((t for t in teams if t != fga['team']), None))
+        elif fga is not None and fga['team'] is None:         # shot-clock violations are often logged to no team
+            fga = dict(fga, team=offense)
         if fga is None or fga['team'] not in abbr or (offense is not None and fga['team'] != offense):
             continue
         margin = abs(rows[i]['home'] - rows[i]['away'])
