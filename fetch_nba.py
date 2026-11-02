@@ -423,6 +423,20 @@ for gid, sides in game_team_box.items():
             t['off'][k] += mine[k]; t['def'][k] += theirs[k]
         t['games'] += 1
 
+# Luck-adjusted ratings: 3P% barely carries over at this sample size (5-game r ~0.09 for a team's own 3P%,
+# ~0.03 for opponents'), so each side's 3P% is shrunk toward league average by adding C games of league-average
+# shooting, and the points that came from the gap are taken out. Turnovers and everything else stay as they are.
+C_3P_OFF, C_3P_DEF = 50.6, 162.0
+lg3 = sum(t['off']['fg3m'] for t in ff_tot.values()) / (sum(t['off']['fg3a'] for t in ff_tot.values()) or 1)
+
+def three_luck(t, side, c):
+    """Points per 100 possessions from `side`'s 3P% beyond what is expected to hold up."""
+    x, g = t[side], t['games']
+    poss = sum(y['fga'] + 0.44 * y['fta'] - y['oreb'] + y['tov'] for y in (t['off'], t['def'])) / 2 or 1
+    p3 = x['fg3m'] / (x['fg3a'] or 1)
+    reg = lg3 + (p3 - lg3) * g / (g + c)
+    return 100 * 3 * (p3 - reg) * x['fg3a'] / poss
+
 four_factors = []
 lg_off = dict.fromkeys(FF_KEYS, 0.0)
 for team in active_teams:
@@ -437,6 +451,10 @@ for team in active_teams:
     season = ratings.get(team['name'], {}).get('season', {})
     four_factors.append({'team': team['name'], 'games': t['games'], 'net': season.get('net'),
                          'ortg': season.get('ortg'), 'drtg': season.get('drtg'), 'off': off, 'def': dfn})
+    if season.get('ortg') is not None and season.get('drtg') is not None:
+        ao = round(season['ortg'] - three_luck(t, 'off', C_3P_OFF), 1)
+        ad = round(season['drtg'] - three_luck(t, 'def', C_3P_DEF), 1)
+        four_factors[-1]['adj'] = {'ortg': ao, 'drtg': ad, 'net': round(ao - ad, 1)}
 four_factors.sort(key=lambda r: r['net'] or 0, reverse=True)
 ff_league = ff_rates(lg_off, lg_off)
 print(f"  Four factors for {len(four_factors)} teams. League eFG {ff_league['efg']}%, TOV {ff_league['tov']}%, OREB {ff_league['oreb']}%")
