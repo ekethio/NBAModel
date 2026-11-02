@@ -48,6 +48,8 @@
   .view-tab { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 24px; border: none; background: transparent; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
   .view-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
   .view-tab:hover:not(.active) { color: var(--text); }
+  #ff-table th.ff-group { text-align: center; cursor: default; color: var(--accent); border-bottom: 1px solid var(--border); }
+  #ff-table td, #ff-table th { white-space: nowrap; }
   .tab-panel { display: none; padding-top: 24px; }
   .tab-panel.active { display: block; }
   .section-header { display: flex; align-items: center; gap: 16px; margin: 0 0 16px; }
@@ -198,6 +200,7 @@
       <button class="view-tab" onclick="switchTab('detail',this)">Team Detail</button>
       <button class="view-tab" onclick="switchTab('splits',this)">Splits</button>
       <button class="view-tab" onclick="switchTab('ratings',this)">Ratings</button>
+      <button class="view-tab" onclick="switchTab('factors',this)">Four Factors</button>
       <a class="view-tab" href="picks.html" style="text-decoration:none">Bets</a>
       <button class="view-tab" onclick="switchTab('fouls',this)">Fouls &amp; FTA</button>
     </div>
@@ -280,6 +283,26 @@
         </table>
       </div>
       <div style="font-size:11px;color:var(--muted);padding:8px 4px" id="rtg-lg-avg"></div>
+    </div>
+
+    <!-- FOUR FACTORS -->
+    <div class="tab-panel" id="tab-factors">
+      <div class="section-header"><h2>Four Factors</h2><div class="line"></div><div class="tag">Season</div></div>
+      <div class="table-wrap">
+        <table id="ff-table">
+          <thead>
+            <tr>
+              <th colspan="3" style="cursor:default"></th>
+              <th colspan="7" class="ff-group">Offense</th>
+              <th colspan="7" class="ff-group">Defense (opponents)</th>
+              <th style="cursor:default"></th>
+            </tr>
+            <tr id="ff-head"></tr>
+          </thead>
+          <tbody id="ff-body"><tr><td colspan="18" style="text-align:center;color:var(--muted);padding:2rem">Loading...</td></tr></tbody>
+        </table>
+      </div>
+      <div style="font-size:11px;color:var(--muted);padding:8px 4px;line-height:1.7" id="ff-note"></div>
     </div>
 
     <!-- FOULS & FTA -->
@@ -370,6 +393,7 @@ function renderAll() {
 
   if (d.pointsData) { renderPointsTable(); renderPaceTable(); renderTeamSelect(); }
   if (d.ratings)    { rtgRender(); }
+  if (d.fourFactors){ ffDraw(); }
   if (d.fouls)      { foulInit(); }
 }
 
@@ -546,6 +570,54 @@ function rtgDraw() {
   const la=statsData.league_avg||{};
   document.getElementById('rtg-lg-avg').textContent =
     la.ortg ? `League avg — ORTG: ${la.ortg}  DRTG: ${la.drtg}` : '';
+}
+
+// ═══════════════════════════════════════════════════════════
+// FOUR FACTORS TAB
+// ═══════════════════════════════════════════════════════════
+// [key, label, side, higher is better for that team?]
+const FF_COLS = [
+  ['net','Net',null,true],
+  ['off.efg','eFG%','off',true],['off.fg3','3P%','off',true],['off.fg3r','3PA rate','off',null],['off.fg2','2P%','off',true],
+  ['off.tov','TOV%','off',false],['off.oreb','OREB%','off',true],['off.ftr','FT rate','off',true],
+  ['def.efg','eFG%','def',false],['def.fg3','3P%','def',false],['def.fg3r','3PA rate','def',null],['def.fg2','2P%','def',false],
+  ['def.tov','TOV%','def',true],['def.dreb','DREB%','def',true],['def.ftr','FT rate','def',false],
+];
+let FF_SORT='net', FF_ASC=false;
+const ffVal=(r,k)=>k.split('.').reduce((o,p)=>o?.[p],r);
+
+function ffSort(k) {
+  if (FF_SORT===k) FF_ASC=!FF_ASC; else { FF_SORT=k; FF_ASC=false; }
+  ffDraw();
+}
+
+function ffDraw() {
+  const lg = statsData.fourFactorsLeague||{};
+  const lgv = k => { const [side,f]=k.split('.'); if(!f) return 0; return f==='dreb' ? 100-(lg.oreb||0) : lg[f]; };
+  document.getElementById('ff-head').innerHTML =
+    '<th style="text-align:left;cursor:default;width:36px">#</th><th style="text-align:left;cursor:default">Team</th>' +
+    FF_COLS.map(([k,l])=>`<th onclick="ffSort('${k}')" class="${FF_SORT===k?(FF_ASC?'sort-asc':'sort-desc'):''}" style="text-align:right">${l}</th>`).join('') +
+    '<th style="text-align:right;cursor:default">GP</th>';
+  const rows=[...statsData.fourFactors].sort((a,b)=>{const av=ffVal(a,FF_SORT)??0,bv=ffVal(b,FF_SORT)??0;return FF_ASC?av-bv:bv-av;});
+  const cell=(r,[k,,side,good])=>{
+    const v=ffVal(r,k);
+    if(k==='net') return `<td style="text-align:right"><span class="${v>0?'badge-pos':v<0?'badge-neg':''}">${v>0?'+':''}${v==null?'—':v.toFixed(1)}</span></td>`;
+    const d=v-lgv(k); const better = good===null ? 0 : (good ? d : -d);
+    const col = Math.abs(d)<0.5||good===null ? 'var(--muted)' : better>0 ? 'var(--green)' : 'var(--red)';
+    const sep = k==='def.efg' ? 'border-left:1px solid var(--border);' : '';
+    return `<td style="${sep}text-align:right;color:${col}">${v==null?'—':v.toFixed(1)}</td>`;
+  };
+  document.getElementById('ff-body').innerHTML = rows.map((r,i)=>`<tr>
+      <td style="color:var(--muted);font-size:12px">${i+1}</td>
+      <td style="text-align:left;font-weight:700;font-size:13px">${r.team}</td>
+      ${FF_COLS.map(c=>cell(r,c)).join('')}
+      <td style="text-align:right;color:var(--muted)">${r.games}</td></tr>`).join('') +
+    `<tr class="avg-row"><td></td><td style="text-align:left;font-weight:700">League</td><td></td>
+      ${FF_COLS.slice(1).map(([k])=>`<td style="${k==='def.efg'?'border-left:1px solid var(--border);':''}text-align:right;color:var(--gold)">${(lgv(k)??0).toFixed(1)}</td>`).join('')}<td></td></tr>`;
+  document.getElementById('ff-note').innerHTML =
+    'eFG% = (FGM + 0.5 &times; 3PM) / FGA, built from 3P%, 2P% and how many shots are threes (3PA rate). ' +
+    'TOV% = turnovers per 100 plays. OREB% / DREB% = share of available rebounds. FT rate = free throws made per 100 shots. ' +
+    'Defense columns are what opponents did; green = better than league average for that team, red = worse. Net from the Ratings tab (raw).';
 }
 
 // ═══════════════════════════════════════════════════════════
