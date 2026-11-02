@@ -1,15 +1,9 @@
 {
- "updatedAt": "2026-10-31 16:52 ET",
- "today": "2026-10-31",
+ "updatedAt": "2026-11-01 19:47 ET",
+ "today": "2026-11-01",
  "models": {
   "A": {
    "record": {
-    "w": 0,
-    "l": 0,
-    "p": 0,
-    "units": 0.0
-   },
-   "passed_record": {
     "w": 0,
     "l": 0,
     "p": 0,
@@ -19,12 +13,6 @@
   },
   "B": {
    "record": {
-    "w": 0,
-    "l": 0,
-    "p": 0,
-    "units": 0.0
-   },
-   "passed_record": {
     "w": 0,
     "l": 0,
     "p": 0,
