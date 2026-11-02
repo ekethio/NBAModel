@@ -193,6 +193,12 @@ def shift_direction(team, n):
         return -1, (round(d1, 2), round(d2, 2))    # slower: under
     return 0, (round(d1, 2), round(d2, 2))
 
+def won_last(team):
+    """Whether the team won its most recent game with time to shot (the second of its two trigger games)."""
+    g = games[log[team][-1][1]]
+    us, them = (g['home_score'], g['away_score']) if g['home'] == team else (g['away_score'], g['home_score'])
+    return us > them
+
 lg = [v['tts'] for g in games.values() for v in g.get('tts', {}).values()]
 if lg:
     print(f"  League time to shot so far: {sum(lg) / len(lg):.2f} s over {len(lg)} team-games")
@@ -226,20 +232,28 @@ for name, n in MODELS.items():
         if dh * da < 0 or dh + da == 0:
             continue
         side = 'Over' if dh + da > 0 else 'Under'
+        # Shifts carried by a team that just lost have been close to break-even: pass on those, but keep grading them
+        shifters = [t for t, d in ((g['home'], dh), (g['away'], da)) if d]
+        passed = not all(won_last(t) for t in shifters)
         p = history.get(g['id'])
         if p is None:
             history[g['id']] = {'id': g['id'], 'date': g['date'], 'tip': g['tip'],
                                 'matchup': f"{g['away']} @ {g['home']}", 'side': side,
-                                'line': g['line'], 'posted': now}
+                                'line': g['line'], 'posted': now, 'passed': passed}
         elif p.get('line') is None and g['line'] is not None:
             p['line'] = g['line']
     grade(history)
     hist = sorted(history.values(), key=lambda p: (p['date'], p['tip']), reverse=True)
-    w = sum(p.get('result') == 'W' for p in hist)
-    l = sum(p.get('result') == 'L' for p in hist)
-    pu = sum(p.get('result') == 'P' for p in hist)
-    models[name] = {'record': {'w': w, 'l': l, 'p': pu, 'units': round(w * 100 / 110 - l, 2)}, 'history': hist}
-    print(f"  {sum(p['date'] == today.isoformat() for p in hist)} bets today, record {w}-{l}-{pu}")
+
+    def record(bets):
+        w = sum(p.get('result') == 'W' for p in bets)
+        l = sum(p.get('result') == 'L' for p in bets)
+        pu = sum(p.get('result') == 'P' for p in bets)
+        return {'w': w, 'l': l, 'p': pu, 'units': round(w * 100 / 110 - l, 2)}
+
+    rec = record([p for p in hist if not p.get('passed')])
+    models[name] = {'record': rec, 'passed_record': record([p for p in hist if p.get('passed')]), 'history': hist}
+    print(f"  {sum(p['date'] == today.isoformat() for p in hist)} bets today, record {rec['w']}-{rec['l']}-{rec['p']}")
 
 with open(PICKS_FILE, 'w') as f:
     json.dump({'updatedAt': now, 'today': today.isoformat(), 'models': models}, f, indent=1)

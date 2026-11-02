@@ -91,6 +91,7 @@ print("Fetching box scores for pace calculation...")
 game_pace       = {}
 game_totals     = {}
 game_box        = {}   # NEW: store box stats per game for fouls/FTA
+game_team_box   = {}   # gid -> {team_id: shooting, turnover, rebound and free-throw totals} for four factors
 
 BATCH = 5
 for i, g in enumerate(all_game_stubs):
@@ -119,8 +120,14 @@ for i, g in enumerate(all_game_stubs):
             tov  = parse_stat(stats, 'turnovers')
             pf   = parse_stat(stats, 'fouls')
             raw_min = parse_stat(stats, 'minutes')
+            fg3 = parse_stat(stats, 'threePointFieldGoalsMade-threePointFieldGoalsAttempted')
+            fg3m, fg3a = fg3 if isinstance(fg3, tuple) else (0, 0)
+            ttov = parse_stat(stats, 'totalTurnovers') or tov      # team turnovers included when ESPN lists them
             td.append({'fga':fga,'fgm':fgm,'fta':fta,'oreb':oreb,'dreb':dreb,
                         'tov':tov,'min':raw_min,'pf':pf,'ftm':ftm})
+            game_team_box.setdefault(gid, {})[t.get('team', {}).get('id')] = {
+                'fgm':fgm,'fga':fga,'fg3m':fg3m,'fg3a':fg3a,'ftm':ftm,'fta':fta,
+                'oreb':oreb,'dreb':dreb,'tov':ttov}
 
         # Store box stats for fouls/FTA tab
         game_box[gid] = {
@@ -385,6 +392,56 @@ for t in active_teams:
 print(f"  Ratings done. League ORTG:{lg_ortg} DRTG:{lg_drtg}")
 
 # ══════════════════════════════════════════════════════════════════
+# Four factors: shooting (eFG%, with 3P% and 3PA rate as its parts), turnovers, rebounding, free throws
+# ══════════════════════════════════════════════════════════════════
+print("Computing four factors...")
+FF_KEYS = ('fgm','fga','fg3m','fg3a','ftm','fta','oreb','dreb','tov')
+
+def ff_rates(us, them):
+    """Four-factor rates for the side whose totals are `us`, against opponents' totals `them`."""
+    fga = us['fga'] or 1
+    fg2a = (us['fga'] - us['fg3a']) or 1
+    poss = (us['fga'] + 0.44 * us['fta'] + us['tov']) or 1
+    return {
+        'efg':  round(100 * (us['fgm'] + 0.5 * us['fg3m']) / fga, 1),
+        'fg3':  round(100 * us['fg3m'] / (us['fg3a'] or 1), 1),
+        'fg3r': round(100 * us['fg3a'] / fga, 1),                     # share of shots that are threes
+        'fg2':  round(100 * (us['fgm'] - us['fg3m']) / fg2a, 1),
+        'tov':  round(100 * us['tov'] / poss, 1),                     # turnovers per 100 plays
+        'oreb': round(100 * us['oreb'] / ((us['oreb'] + them['dreb']) or 1), 1),
+        'ftr':  round(100 * us['ftm'] / fga, 1),                      # free throws made per 100 shots
+    }
+
+ff_tot = {}   # tid -> {'off': totals, 'def': opponents' totals, 'games': n}
+for gid, sides in game_team_box.items():
+    if len(sides) != 2:
+        continue
+    (a, sa), (b, sb) = sides.items()
+    for me, mine, theirs in ((a, sa, sb), (b, sb, sa)):
+        t = ff_tot.setdefault(me, {'off': dict.fromkeys(FF_KEYS, 0.0), 'def': dict.fromkeys(FF_KEYS, 0.0), 'games': 0})
+        for k in FF_KEYS:
+            t['off'][k] += mine[k]; t['def'][k] += theirs[k]
+        t['games'] += 1
+
+four_factors = []
+lg_off = dict.fromkeys(FF_KEYS, 0.0)
+for team in active_teams:
+    t = ff_tot.get(team['id'])
+    if not t:
+        continue
+    for k in FF_KEYS:
+        lg_off[k] += t['off'][k]
+    off = ff_rates(t['off'], t['def'])
+    dfn = ff_rates(t['def'], t['off'])
+    dfn['dreb'] = round(100 - dfn.pop('oreb'), 1)                  # defensive rebound rate = 1 - opponents' OREB%
+    season = ratings.get(team['name'], {}).get('season', {})
+    four_factors.append({'team': team['name'], 'games': t['games'], 'net': season.get('net'),
+                         'ortg': season.get('ortg'), 'drtg': season.get('drtg'), 'off': off, 'def': dfn})
+four_factors.sort(key=lambda r: r['net'] or 0, reverse=True)
+ff_league = ff_rates(lg_off, lg_off)
+print(f"  Four factors for {len(four_factors)} teams. League eFG {ff_league['efg']}%, TOV {ff_league['tov']}%, OREB {ff_league['oreb']}%")
+
+# ══════════════════════════════════════════════════════════════════
 # NEW: Fouls + FTA stretches from box score data
 # ══════════════════════════════════════════════════════════════════
 print("Computing fouls/FTA stretches...")
@@ -424,6 +481,8 @@ output = {
     'league_avg':      {'ortg': lg_ortg, 'drtg': lg_drtg},
     'ratings':         ratings,
     'fouls':           {'stretches': stretches, 'games': games_list},
+    'fourFactors':     four_factors,
+    'fourFactorsLeague': ff_league,
 }
 
 with open(OUTPUT_FILE, 'w') as f:
