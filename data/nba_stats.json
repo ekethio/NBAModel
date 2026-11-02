@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-02 12:35 UTC",
+  "updatedAt": "2026-11-02 12:37 UTC",
   "season": "2026-27",
   "leagueAvgPoints": 227.4,
   "leagueAvgPace": 100.9,
@@ -503,7 +503,7 @@
     {
       "team": "Los Angeles Lakers",
       "avgPace": 100.5,
-      "homePace": 103.2,
+      "homePace": 103.1,
       "awayPace": 96.9,
       "l20Pace": null,
       "l14Pace": null,
@@ -574,7 +574,7 @@
       "team": "Chicago Bulls",
       "avgPace": 107.0,
       "homePace": 106.2,
-      "awayPace": 107.5,
+      "awayPace": 107.4,
       "l20Pace": null,
       "l14Pace": null,
       "l7Pace": null,
@@ -678,7 +678,7 @@
       "l7Pace": null,
       "adjL7Pace": null,
       "l3Pace": 99.7,
-      "adjL3Pace": 101.0,
+      "adjL3Pace": 100.9,
       "games": 6,
       "paceScore": 46.1
     },
@@ -796,7 +796,7 @@
     },
     {
       "team": "Orlando Magic",
-      "avgPace": 99.2,
+      "avgPace": 99.3,
       "homePace": 100.2,
       "awayPace": 98.3,
       "l20Pace": null,
@@ -806,7 +806,7 @@
       "l3Pace": 94.4,
       "adjL3Pace": 93.6,
       "games": 6,
-      "paceScore": 44.6
+      "paceScore": 44.7
     },
     {
       "team": "Washington Wizards",
@@ -962,8 +962,8 @@
         "oppAvg": 224.3,
         "adjTotal": 260.1,
         "pace": 110.6,
-        "oppPace": 99.2,
-        "adjPace": 112.3
+        "oppPace": 99.3,
+        "adjPace": 112.2
       }
     ],
     "Boston Celtics": [
@@ -976,8 +976,8 @@
         "oppAvg": 224.3,
         "adjTotal": 208.1,
         "pace": 90.2,
-        "oppPace": 99.2,
-        "adjPace": 91.9
+        "oppPace": 99.3,
+        "adjPace": 91.8
       },
       {
         "date": "2026-10-30",
@@ -2268,8 +2268,8 @@
         "oppAvg": 224.3,
         "adjTotal": 211.1,
         "pace": 99.9,
-        "oppPace": 99.2,
-        "adjPace": 101.6
+        "oppPace": 99.3,
+        "adjPace": 101.5
       },
       {
         "date": "2026-10-21",
@@ -2404,8 +2404,8 @@
         "oppAvg": 224.3,
         "adjTotal": 216.1,
         "pace": 101.8,
-        "oppPace": 99.2,
-        "adjPace": 103.5
+        "oppPace": 99.3,
+        "adjPace": 103.4
       },
       {
         "date": "2026-10-23",
@@ -2948,8 +2948,8 @@
         "oppAvg": 224.3,
         "adjTotal": 238.1,
         "pace": 89.4,
-        "oppPace": 99.2,
-        "adjPace": 91.1
+        "oppPace": 99.3,
+        "adjPace": 91.0
       },
       {
         "date": "2026-10-28",
@@ -2960,8 +2960,8 @@
         "oppAvg": 224.3,
         "adjTotal": 231.1,
         "pace": 103.6,
-        "oppPace": 99.2,
-        "adjPace": 105.3
+        "oppPace": 99.3,
+        "adjPace": 105.2
       },
       {
         "date": "2026-10-25",
@@ -3674,7 +3674,7 @@
         "adj_ortg": 109.4,
         "adj_drtg": 121.5,
         "adj_net": -12.1,
-        "pace": 103.8,
+        "pace": 103.7,
         "games": 6
       },
       "l14": {
@@ -3684,7 +3684,7 @@
         "adj_ortg": 109.4,
         "adj_drtg": 121.5,
         "adj_net": -12.1,
-        "pace": 103.8,
+        "pace": 103.7,
         "games": 6
       },
       "l7": {
@@ -3694,7 +3694,7 @@
         "adj_ortg": 109.4,
         "adj_drtg": 121.5,
         "adj_net": -12.1,
-        "pace": 103.8,
+        "pace": 103.7,
         "games": 6
       }
     },
@@ -4026,7 +4026,7 @@
         "adj_ortg": 113.7,
         "adj_drtg": 108.6,
         "adj_net": 5.1,
-        "pace": 102.5,
+        "pace": 102.4,
         "games": 6
       },
       "l14": {
@@ -4036,7 +4036,7 @@
         "adj_ortg": 113.7,
         "adj_drtg": 108.6,
         "adj_net": 5.1,
-        "pace": 102.5,
+        "pace": 102.4,
         "games": 6
       },
       "l7": {
@@ -4046,7 +4046,7 @@
         "adj_ortg": 113.7,
         "adj_drtg": 108.6,
         "adj_net": 5.1,
-        "pace": 102.5,
+        "pace": 102.4,
         "games": 6
       }
     },
