@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-02 13:10 UTC",
+  "updatedAt": "2026-11-02 16:52 UTC",
   "season": "2026-27",
   "leagueAvgPoints": 227.4,
   "leagueAvgPace": 100.9,
@@ -5104,7 +5104,7 @@
         "fg3r": 32.8,
         "fg2": 59.2,
         "tov": 15.8,
-        "oreb": 24.0,
+        "oreb": 23.9,
         "ftr": 28.4
       },
       "def": {
@@ -5594,7 +5594,7 @@
         "fg2": 61.4,
         "tov": 13.2,
         "ftr": 23.8,
-        "dreb": 73.4
+        "dreb": 73.5
       },
       "adj": {
         "ortg": 109.3,
