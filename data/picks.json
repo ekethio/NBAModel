@@ -1,6 +1,6 @@
 {
- "updatedAt": "2026-11-03 20:25 ET",
- "today": "2026-11-03",
+ "updatedAt": "2026-11-04 16:22 ET",
+ "today": "2026-11-04",
  "models": {
   "A": {
    "record": {
@@ -30,7 +30,18 @@
     "p": 0,
     "units": 0.0
    },
-   "history": []
+   "history": [
+    {
+     "id": "401909934",
+     "date": "2026-11-04",
+     "tip": "2026-11-05T03:00Z",
+     "matchup": "LAL @ SAC",
+     "side": "Under",
+     "line": 233.5,
+     "posted": "2026-11-04 16:22 ET",
+     "passed": false
+    }
+   ]
   }
  }
 }
