@@ -1,6 +1,6 @@
 {
- "updatedAt": "2026-11-04 20:28 ET",
- "today": "2026-11-04",
+ "updatedAt": "2026-11-05 13:25 ET",
+ "today": "2026-11-05",
  "models": {
   "A": {
    "record": {
@@ -19,10 +19,10 @@
   },
   "B": {
    "record": {
-    "w": 0,
+    "w": 1,
     "l": 0,
     "p": 0,
-    "units": 0.0
+    "units": 0.91
    },
    "passed_record": {
     "w": 0,
@@ -39,7 +39,9 @@
      "side": "Under",
      "line": 233.5,
      "posted": "2026-11-04 16:22 ET",
-     "passed": false
+     "passed": false,
+     "final": 219,
+     "result": "W"
     }
    ]
   }
