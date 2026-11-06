@@ -1,6 +1,6 @@
 {
- "updatedAt": "2026-11-05 20:34 ET",
- "today": "2026-11-05",
+ "updatedAt": "2026-11-06 15:57 ET",
+ "today": "2026-11-06",
  "models": {
   "A": {
    "record": {
@@ -31,6 +31,36 @@
     "units": 0.0
    },
    "history": [
+    {
+     "id": "401909295",
+     "date": "2026-11-06",
+     "tip": "2026-11-07T03:00Z",
+     "matchup": "SA @ SAC",
+     "side": "Under",
+     "line": 231.5,
+     "posted": "2026-11-06 15:57 ET",
+     "passed": true
+    },
+    {
+     "id": "401909292",
+     "date": "2026-11-06",
+     "tip": "2026-11-07T01:00Z",
+     "matchup": "TOR @ MIL",
+     "side": "Under",
+     "line": 229.5,
+     "posted": "2026-11-06 15:57 ET",
+     "passed": true
+    },
+    {
+     "id": "401909288",
+     "date": "2026-11-06",
+     "tip": "2026-11-07T00:00Z",
+     "matchup": "BOS @ CHA",
+     "side": "Under",
+     "line": 208.5,
+     "posted": "2026-11-06 15:57 ET",
+     "passed": true
+    },
     {
      "id": "401909934",
      "date": "2026-11-04",
