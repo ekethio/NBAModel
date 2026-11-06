@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-06 15:57 ET",
+ "updatedAt": "2026-11-06 16:27 ET",
  "today": "2026-11-06",
  "models": {
   "A": {
@@ -15,7 +15,8 @@
     "p": 0,
     "units": 0.0
    },
-   "history": []
+   "history": [],
+   "watch": []
   },
   "B": {
    "record": {
@@ -72,6 +73,118 @@
      "passed": false,
      "final": 219,
      "result": "W"
+    }
+   ],
+   "watch": [
+    {
+     "team": "MIL",
+     "status": "triggered",
+     "side": "Under",
+     "last": 1.12,
+     "prev": 0.91,
+     "last_date": "2026-11-04",
+     "last_opp": "BOS",
+     "won": false
+    },
+    {
+     "team": "CHA",
+     "status": "triggered",
+     "side": "Under",
+     "last": 1.08,
+     "prev": 1.04,
+     "last_date": "2026-11-04",
+     "last_opp": "BKN",
+     "won": false
+    },
+    {
+     "team": "SAC",
+     "status": "triggered",
+     "side": "Under",
+     "last": 0.9,
+     "prev": 1.18,
+     "last_date": "2026-11-04",
+     "last_opp": "LAL",
+     "won": false
+    },
+    {
+     "team": "PHI",
+     "status": "one game",
+     "side": "Under",
+     "last": 1.55,
+     "prev": 0.4,
+     "last_date": "2026-11-04",
+     "last_opp": "DET",
+     "won": true
+    },
+    {
+     "team": "LAC",
+     "status": "one game",
+     "side": "Under",
+     "last": 1.29,
+     "prev": 0.27,
+     "last_date": "2026-11-04",
+     "last_opp": "MIA",
+     "won": false
+    },
+    {
+     "team": "ORL",
+     "status": "one game",
+     "side": "Over",
+     "last": -1.28,
+     "prev": 1.67,
+     "last_date": "2026-11-05",
+     "last_opp": "PHX",
+     "won": false
+    },
+    {
+     "team": "LAL",
+     "status": "one game",
+     "side": "Over",
+     "last": -1.26,
+     "prev": 1.75,
+     "last_date": "2026-11-04",
+     "last_opp": "SAC",
+     "won": true
+    },
+    {
+     "team": "ATL",
+     "status": "one game",
+     "side": "Under",
+     "last": 1.17,
+     "prev": -0.38,
+     "last_date": "2026-11-04",
+     "last_opp": "WSH",
+     "won": true
+    },
+    {
+     "team": "HOU",
+     "status": "one game",
+     "side": "Over",
+     "last": -1.16,
+     "prev": -0.11,
+     "last_date": "2026-11-04",
+     "last_opp": "MIN",
+     "won": false
+    },
+    {
+     "team": "MEM",
+     "status": "one game",
+     "side": "Under",
+     "last": 1.04,
+     "prev": 0.2,
+     "last_date": "2026-11-04",
+     "last_opp": "IND",
+     "won": false
+    },
+    {
+     "team": "UTAH",
+     "status": "one game",
+     "side": "Under",
+     "last": 0.91,
+     "prev": 0.39,
+     "last_date": "2026-11-04",
+     "last_opp": "NO",
+     "won": false
     }
    ]
   }
