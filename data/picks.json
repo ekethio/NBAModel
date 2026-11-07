@@ -1,6 +1,6 @@
 {
- "updatedAt": "2026-11-06 19:57 ET",
- "today": "2026-11-06",
+ "updatedAt": "2026-11-07 14:29 ET",
+ "today": "2026-11-07",
  "models": {
   "A": {
    "record": {
@@ -25,10 +25,10 @@
     "units": 0.91
    },
    "passed_record": {
-    "w": 0,
-    "l": 0,
+    "w": 2,
+    "l": 1,
     "p": 0,
-    "units": 0.0
+    "units": 0.82
    },
    "history": [
     {
@@ -39,7 +39,9 @@
      "side": "Under",
      "line": 231.5,
      "posted": "2026-11-06 15:57 ET",
-     "passed": true
+     "passed": true,
+     "final": 233,
+     "result": "L"
     },
     {
      "id": "401909292",
@@ -49,7 +51,9 @@
      "side": "Under",
      "line": 229.5,
      "posted": "2026-11-06 15:57 ET",
-     "passed": true
+     "passed": true,
+     "final": 228,
+     "result": "W"
     },
     {
      "id": "401909288",
@@ -59,7 +63,9 @@
      "side": "Under",
      "line": 208.5,
      "posted": "2026-11-06 15:57 ET",
-     "passed": true
+     "passed": true,
+     "final": 199,
+     "result": "W"
     },
     {
      "id": "401909934",
