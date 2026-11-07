@@ -252,7 +252,26 @@ for name, n in MODELS.items():
         return {'w': w, 'l': l, 'p': pu, 'units': round(w * 100 / 110 - l, 2)}
 
     rec = record([p for p in hist if not p.get('passed')])
-    models[name] = {'record': rec, 'passed_record': record([p for p in hist if p.get('passed')]), 'history': hist}
+    # Teams close to a trigger: both of the last two games past the threshold (triggered), or only the last one
+    # (one more game the same way triggers). Shifts are seconds vs the baseline; negative = faster.
+    watch = []
+    for team, games_ in log.items():
+        if len(games_) < n + 2:
+            continue
+        dirn, pair = shift_direction(team, n)
+        d1, d2 = pair
+        last = games[games_[-1][1]]
+        opp = last['away'] if last['home'] == team else last['home']
+        if dirn:
+            status = 'triggered'
+        elif abs(d1) >= THRESHOLD:
+            status = 'one game'
+        else:
+            continue
+        watch.append({'team': team, 'status': status, 'side': ('Over' if (dirn or -d1) > 0 else 'Under'),
+                      'last': d1, 'prev': d2, 'last_date': games_[-1][0], 'last_opp': opp, 'won': won_last(team)})
+    watch.sort(key=lambda w: (w['status'] != 'triggered', -abs(w['last'])))
+    models[name] = {'record': rec, 'passed_record': record([p for p in hist if p.get('passed')]), 'history': hist, 'watch': watch}
     print(f"  {sum(p['date'] == today.isoformat() for p in hist)} bets today, record {rec['w']}-{rec['l']}-{rec['p']}")
 
 with open(PICKS_FILE, 'w') as f:
