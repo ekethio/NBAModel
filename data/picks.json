@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-07 14:29 ET",
+ "updatedAt": "2026-11-07 15:53 ET",
  "today": "2026-11-07",
  "models": {
   "A": {
@@ -15,7 +15,8 @@
     "p": 0,
     "units": 0.0
    },
-   "history": []
+   "history": [],
+   "watch": []
   },
   "B": {
    "record": {
@@ -78,6 +79,118 @@
      "passed": false,
      "final": 219,
      "result": "W"
+    }
+   ],
+   "watch": [
+    {
+     "team": "MIL",
+     "status": "triggered",
+     "side": "Under",
+     "last": 1.17,
+     "prev": 1.16,
+     "last_date": "2026-11-06",
+     "last_opp": "TOR",
+     "won": false
+    },
+    {
+     "team": "MEM",
+     "status": "triggered",
+     "side": "Under",
+     "last": 0.92,
+     "prev": 0.88,
+     "last_date": "2026-11-06",
+     "last_opp": "OKC",
+     "won": false
+    },
+    {
+     "team": "BOS",
+     "status": "one game",
+     "side": "Over",
+     "last": -2.01,
+     "prev": -0.21,
+     "last_date": "2026-11-06",
+     "last_opp": "CHA",
+     "won": true
+    },
+    {
+     "team": "LAL",
+     "status": "one game",
+     "side": "Under",
+     "last": 2.0,
+     "prev": -1.49,
+     "last_date": "2026-11-06",
+     "last_opp": "POR",
+     "won": true
+    },
+    {
+     "team": "SA",
+     "status": "one game",
+     "side": "Under",
+     "last": 1.79,
+     "prev": 0.35,
+     "last_date": "2026-11-06",
+     "last_opp": "SAC",
+     "won": true
+    },
+    {
+     "team": "LAC",
+     "status": "one game",
+     "side": "Under",
+     "last": 1.29,
+     "prev": 0.27,
+     "last_date": "2026-11-04",
+     "last_opp": "MIA",
+     "won": false
+    },
+    {
+     "team": "ORL",
+     "status": "one game",
+     "side": "Over",
+     "last": -1.28,
+     "prev": 1.67,
+     "last_date": "2026-11-05",
+     "last_opp": "PHX",
+     "won": false
+    },
+    {
+     "team": "HOU",
+     "status": "one game",
+     "side": "Over",
+     "last": -1.16,
+     "prev": -0.11,
+     "last_date": "2026-11-04",
+     "last_opp": "MIN",
+     "won": false
+    },
+    {
+     "team": "MIN",
+     "status": "one game",
+     "side": "Under",
+     "last": 1.11,
+     "prev": 0.07,
+     "last_date": "2026-11-06",
+     "last_opp": "NO",
+     "won": true
+    },
+    {
+     "team": "SAC",
+     "status": "one game",
+     "side": "Under",
+     "last": 1.05,
+     "prev": 0.72,
+     "last_date": "2026-11-06",
+     "last_opp": "SA",
+     "won": false
+    },
+    {
+     "team": "TOR",
+     "status": "one game",
+     "side": "Under",
+     "last": 0.81,
+     "prev": -0.39,
+     "last_date": "2026-11-06",
+     "last_opp": "MIL",
+     "won": true
     }
    ]
   }
