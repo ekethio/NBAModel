@@ -1,6 +1,6 @@
 {
- "updatedAt": "2026-11-07 19:40 ET",
- "today": "2026-11-07",
+ "updatedAt": "2026-11-08 14:47 ET",
+ "today": "2026-11-08",
  "models": {
   "A": {
    "record": {
@@ -32,6 +32,16 @@
     "units": 0.82
    },
    "history": [
+    {
+     "id": "401909949",
+     "date": "2026-11-08",
+     "tip": "2026-11-09T01:00Z",
+     "matchup": "BOS @ MIL",
+     "side": "Under",
+     "line": 222.5,
+     "posted": "2026-11-08 14:47 ET",
+     "passed": true
+    },
     {
      "id": "401909295",
      "date": "2026-11-06",
@@ -93,6 +103,16 @@
      "won": false
     },
     {
+     "team": "ORL",
+     "status": "triggered",
+     "side": "Over",
+     "last": -0.94,
+     "prev": -1.62,
+     "last_date": "2026-11-07",
+     "last_opp": "GS",
+     "won": false
+    },
+    {
      "team": "MEM",
      "status": "triggered",
      "side": "Under",
@@ -100,6 +120,16 @@
      "prev": 0.88,
      "last_date": "2026-11-06",
      "last_opp": "OKC",
+     "won": false
+    },
+    {
+     "team": "POR",
+     "status": "triggered",
+     "side": "Under",
+     "last": 0.92,
+     "prev": 0.9,
+     "last_date": "2026-11-07",
+     "last_opp": "SA",
      "won": false
     },
     {
@@ -123,16 +153,6 @@
      "won": true
     },
     {
-     "team": "SA",
-     "status": "one game",
-     "side": "Under",
-     "last": 1.79,
-     "prev": 0.35,
-     "last_date": "2026-11-06",
-     "last_opp": "SAC",
-     "won": true
-    },
-    {
      "team": "LAC",
      "status": "one game",
      "side": "Under",
@@ -140,26 +160,6 @@
      "prev": 0.27,
      "last_date": "2026-11-04",
      "last_opp": "MIA",
-     "won": false
-    },
-    {
-     "team": "ORL",
-     "status": "one game",
-     "side": "Over",
-     "last": -1.28,
-     "prev": 1.67,
-     "last_date": "2026-11-05",
-     "last_opp": "PHX",
-     "won": false
-    },
-    {
-     "team": "HOU",
-     "status": "one game",
-     "side": "Over",
-     "last": -1.16,
-     "prev": -0.11,
-     "last_date": "2026-11-04",
-     "last_opp": "MIN",
      "won": false
     },
     {
