@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-08 07:57 UTC",
+  "updatedAt": "2026-11-08 22:08 UTC",
   "season": "2026-27",
   "leagueAvgPoints": 226.4,
   "leagueAvgPace": 100.4,
@@ -733,8 +733,8 @@
       "l14Pace": null,
       "l7Pace": 99.4,
       "adjL7Pace": 100.6,
-      "l3Pace": 99.5,
-      "adjL3Pace": 100.8,
+      "l3Pace": 99.4,
+      "adjL3Pace": 100.7,
       "games": 8,
       "paceScore": 54.7
     },
@@ -840,12 +840,12 @@
       "team": "Houston Rockets",
       "avgPace": 97.3,
       "homePace": 96.4,
-      "awayPace": 98.2,
+      "awayPace": 98.1,
       "l20Pace": null,
       "l14Pace": null,
       "l7Pace": 96.6,
       "adjL7Pace": 97.0,
-      "l3Pace": 93.8,
+      "l3Pace": 93.7,
       "adjL3Pace": 95.0,
       "games": 10,
       "paceScore": 53.5
@@ -1749,9 +1749,9 @@
         "total": 201.0,
         "oppAvg": 231.0,
         "adjTotal": 196.4,
-        "pace": 96.1,
+        "pace": 96.0,
         "oppPace": 99.1,
-        "adjPace": 97.4
+        "adjPace": 97.3
       },
       {
         "date": "2026-11-05",
@@ -2867,9 +2867,9 @@
         "total": 201.0,
         "oppAvg": 223.0,
         "adjTotal": 204.4,
-        "pace": 96.1,
+        "pace": 96.0,
         "oppPace": 97.3,
-        "adjPace": 99.2
+        "adjPace": 99.1
       },
       {
         "date": "2026-11-06",
@@ -3788,22 +3788,22 @@
     },
     "Houston Rockets": {
       "season": {
-        "ortg": 119.2,
+        "ortg": 119.3,
         "drtg": 110.0,
-        "net": 9.2,
-        "adj_ortg": 120.6,
+        "net": 9.3,
+        "adj_ortg": 120.7,
         "adj_drtg": 108.3,
-        "adj_net": 12.3,
+        "adj_net": 12.4,
         "pace": 97.3,
         "games": 10
       },
       "l14": {
-        "ortg": 119.2,
+        "ortg": 119.3,
         "drtg": 110.0,
-        "net": 9.2,
-        "adj_ortg": 120.6,
+        "net": 9.3,
+        "adj_ortg": 120.7,
         "adj_drtg": 108.3,
-        "adj_net": 12.3,
+        "adj_net": 12.4,
         "pace": 97.3,
         "games": 10
       },
@@ -4460,9 +4460,9 @@
       {
         "stretch": "121-139",
         "games": 19,
-        "fouls_per_game": 41.84,
+        "fouls_per_game": 41.79,
         "fta_per_game": 48.0,
-        "fta_foul_ratio": 1.147
+        "fta_foul_ratio": 1.149
       }
     ],
     "games": [
@@ -5285,7 +5285,7 @@
       {
         "game_id": "401909942",
         "date": "2026-11-08",
-        "total_pf": 49,
+        "total_pf": 48,
         "total_fta": 52
       },
       {
@@ -5426,16 +5426,16 @@
     {
       "team": "Houston Rockets",
       "games": 10,
-      "net": 9.2,
-      "ortg": 119.2,
+      "net": 9.3,
+      "ortg": 119.3,
       "drtg": 110.0,
       "off": {
-        "efg": 55.3,
+        "efg": 55.2,
         "fg3": 37.6,
         "fg3r": 39.3,
-        "fg2": 54.6,
+        "fg2": 54.5,
         "tov": 13.9,
-        "oreb": 31.2,
+        "oreb": 31.4,
         "ftr": 24.3
       },
       "def": {
@@ -5448,9 +5448,9 @@
         "dreb": 72.0
       },
       "adj": {
-        "ortg": 116.7,
+        "ortg": 116.8,
         "drtg": 113.3,
-        "net": 3.4
+        "net": 3.5
       }
     },
     {
@@ -5981,11 +5981,11 @@
       "def": {
         "efg": 55.5,
         "fg3": 38.2,
-        "fg3r": 44.5,
-        "fg2": 54.1,
-        "tov": 15.0,
-        "ftr": 25.5,
-        "dreb": 66.0
+        "fg3r": 44.4,
+        "fg2": 54.0,
+        "tov": 14.9,
+        "ftr": 25.4,
+        "dreb": 65.8
       },
       "adj": {
         "ortg": 112.2,
@@ -6205,7 +6205,7 @@
     }
   ],
   "fourFactorsLeague": {
-    "efg": 53.1,
+    "efg": 53.0,
     "fg3": 34.6,
     "fg3r": 43.0,
     "fg2": 53.9,
