@@ -1,6 +1,6 @@
 {
- "updatedAt": "2026-11-09 22:35 ET",
- "today": "2026-11-09",
+ "updatedAt": "2026-11-10 16:21 ET",
+ "today": "2026-11-10",
  "models": {
   "A": {
    "record": {
@@ -32,6 +32,26 @@
     "units": 2.64
    },
    "history": [
+    {
+     "id": "401909965",
+     "date": "2026-11-10",
+     "tip": "2026-11-11T04:00Z",
+     "matchup": "OKC @ POR",
+     "side": "Under",
+     "line": 226.5,
+     "posted": "2026-11-10 16:21 ET",
+     "passed": true
+    },
+    {
+     "id": "401909960",
+     "date": "2026-11-10",
+     "tip": "2026-11-11T00:30Z",
+     "matchup": "MIL @ NY",
+     "side": "Under",
+     "line": 222.5,
+     "posted": "2026-11-10 16:21 ET",
+     "passed": true
+    },
     {
      "id": "401909955",
      "date": "2026-11-09",
@@ -169,6 +189,16 @@
      "won": false
     },
     {
+     "team": "PHX",
+     "status": "one game",
+     "side": "Under",
+     "last": 1.14,
+     "prev": 0.0,
+     "last_date": "2026-11-09",
+     "last_opp": "SA",
+     "won": false
+    },
+    {
      "team": "MIN",
      "status": "one game",
      "side": "Over",
@@ -177,6 +207,16 @@
      "last_date": "2026-11-08",
      "last_opp": "UTAH",
      "won": true
+    },
+    {
+     "team": "IND",
+     "status": "one game",
+     "side": "Under",
+     "last": 0.82,
+     "prev": -0.66,
+     "last_date": "2026-11-09",
+     "last_opp": "DAL",
+     "won": false
     }
    ]
   }
