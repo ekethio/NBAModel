@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-09 18:48 ET",
+ "updatedAt": "2026-11-09 22:35 ET",
  "today": "2026-11-09",
  "models": {
   "A": {
@@ -21,15 +21,15 @@
   "B": {
    "record": {
     "w": 1,
-    "l": 0,
-    "p": 0,
-    "units": 0.91
-   },
-   "passed_record": {
-    "w": 3,
     "l": 1,
     "p": 0,
-    "units": 1.73
+    "units": -0.09
+   },
+   "passed_record": {
+    "w": 4,
+    "l": 1,
+    "p": 0,
+    "units": 2.64
    },
    "history": [
     {
@@ -40,7 +40,9 @@
      "side": "Under",
      "line": 231.5,
      "posted": "2026-11-09 03:24 ET",
-     "passed": true
+     "passed": true,
+     "final": 220,
+     "result": "W"
     },
     {
      "id": "401909952",
@@ -50,7 +52,9 @@
      "side": "Under",
      "line": 235.5,
      "posted": "2026-11-09 03:24 ET",
-     "passed": false
+     "passed": false,
+     "final": 238,
+     "result": "L"
     },
     {
      "id": "401909949",
@@ -125,14 +129,14 @@
      "won": false
     },
     {
-     "team": "LAL",
+     "team": "TOR",
      "status": "triggered",
      "side": "Under",
-     "last": 1.58,
-     "prev": 2.0,
-     "last_date": "2026-11-08",
-     "last_opp": "DET",
-     "won": true
+     "last": 1.61,
+     "prev": 0.82,
+     "last_date": "2026-11-09",
+     "last_opp": "MEM",
+     "won": false
     },
     {
      "team": "SAC",
@@ -155,16 +159,6 @@
      "won": false
     },
     {
-     "team": "MEM",
-     "status": "triggered",
-     "side": "Under",
-     "last": 0.92,
-     "prev": 0.88,
-     "last_date": "2026-11-06",
-     "last_opp": "OKC",
-     "won": false
-    },
-    {
      "team": "POR",
      "status": "triggered",
      "side": "Under",
@@ -182,16 +176,6 @@
      "prev": 1.29,
      "last_date": "2026-11-08",
      "last_opp": "UTAH",
-     "won": true
-    },
-    {
-     "team": "TOR",
-     "status": "one game",
-     "side": "Under",
-     "last": 0.81,
-     "prev": -0.39,
-     "last_date": "2026-11-06",
-     "last_opp": "MIL",
      "won": true
     }
    ]
