@@ -1,6 +1,6 @@
 {
- "updatedAt": "2026-11-13 20:27 ET",
- "today": "2026-11-13",
+ "updatedAt": "2026-11-14 14:58 ET",
+ "today": "2026-11-14",
  "models": {
   "A": {
    "record": {
@@ -15,7 +15,18 @@
     "p": 0,
     "units": 0.0
    },
-   "history": [],
+   "history": [
+    {
+     "id": "401909984",
+     "date": "2026-11-14",
+     "tip": "2026-11-15T01:00Z",
+     "matchup": "CHI @ MIN",
+     "side": "Over",
+     "line": 234.5,
+     "posted": "2026-11-14 14:58 ET",
+     "passed": false
+    }
+   ],
    "watch": [
     {
      "team": "MIN",
@@ -25,6 +36,16 @@
      "prev": -1.35,
      "last_date": "2026-11-12",
      "last_opp": "DAL",
+     "won": true
+    },
+    {
+     "team": "POR",
+     "status": "triggered",
+     "side": "Under",
+     "last": 1.26,
+     "prev": 0.81,
+     "last_date": "2026-11-13",
+     "last_opp": "SAC",
      "won": true
     },
     {
@@ -48,6 +69,16 @@
      "won": true
     },
     {
+     "team": "SA",
+     "status": "one game",
+     "side": "Over",
+     "last": -1.51,
+     "prev": 0.58,
+     "last_date": "2026-11-13",
+     "last_opp": "GS",
+     "won": true
+    },
+    {
      "team": "WSH",
      "status": "one game",
      "side": "Under",
@@ -56,6 +87,26 @@
      "last_date": "2026-11-12",
      "last_opp": "DET",
      "won": false
+    },
+    {
+     "team": "MEM",
+     "status": "one game",
+     "side": "Over",
+     "last": -0.95,
+     "prev": 0.97,
+     "last_date": "2026-11-13",
+     "last_opp": "NO",
+     "won": true
+    },
+    {
+     "team": "IND",
+     "status": "one game",
+     "side": "Under",
+     "last": 0.9,
+     "prev": -0.13,
+     "last_date": "2026-11-13",
+     "last_opp": "NY",
+     "won": true
     }
    ]
   },
@@ -67,10 +118,10 @@
     "units": -0.09
    },
    "passed_record": {
-    "w": 7,
+    "w": 8,
     "l": 3,
     "p": 0,
-    "units": 3.36
+    "units": 4.27
    },
    "history": [
     {
@@ -81,7 +132,9 @@
      "side": "Under",
      "line": 229.5,
      "posted": "2026-11-13 16:27 ET",
-     "passed": true
+     "passed": true,
+     "final": 227,
+     "result": "W"
     },
     {
      "id": "401909976",
@@ -230,6 +283,16 @@
    ],
    "watch": [
     {
+     "team": "CHI",
+     "status": "triggered",
+     "side": "Under",
+     "last": 1.77,
+     "prev": 2.72,
+     "last_date": "2026-11-13",
+     "last_opp": "ATL",
+     "won": true
+    },
+    {
      "team": "MIN",
      "status": "triggered",
      "side": "Over",
@@ -238,36 +301,6 @@
      "last_date": "2026-11-12",
      "last_opp": "DAL",
      "won": true
-    },
-    {
-     "team": "SAC",
-     "status": "triggered",
-     "side": "Under",
-     "last": 0.87,
-     "prev": 1.03,
-     "last_date": "2026-11-10",
-     "last_opp": "ORL",
-     "won": false
-    },
-    {
-     "team": "POR",
-     "status": "triggered",
-     "side": "Under",
-     "last": 0.8,
-     "prev": 0.84,
-     "last_date": "2026-11-11",
-     "last_opp": "OKC",
-     "won": true
-    },
-    {
-     "team": "CHI",
-     "status": "one game",
-     "side": "Under",
-     "last": 2.85,
-     "prev": 0.63,
-     "last_date": "2026-11-11",
-     "last_opp": "SA",
-     "won": false
     },
     {
      "team": "LAL",
@@ -280,6 +313,46 @@
      "won": true
     },
     {
+     "team": "SA",
+     "status": "one game",
+     "side": "Over",
+     "last": -1.79,
+     "prev": 0.29,
+     "last_date": "2026-11-13",
+     "last_opp": "GS",
+     "won": true
+    },
+    {
+     "team": "MEM",
+     "status": "one game",
+     "side": "Over",
+     "last": -1.01,
+     "prev": 0.9,
+     "last_date": "2026-11-13",
+     "last_opp": "NO",
+     "won": true
+    },
+    {
+     "team": "POR",
+     "status": "one game",
+     "side": "Under",
+     "last": 1.0,
+     "prev": 0.55,
+     "last_date": "2026-11-13",
+     "last_opp": "SAC",
+     "won": true
+    },
+    {
+     "team": "CLE",
+     "status": "one game",
+     "side": "Under",
+     "last": 0.99,
+     "prev": 0.19,
+     "last_date": "2026-11-13",
+     "last_opp": "MIA",
+     "won": false
+    },
+    {
      "team": "PHI",
      "status": "one game",
      "side": "Over",
@@ -288,16 +361,6 @@
      "last_date": "2026-11-12",
      "last_opp": "TOR",
      "won": true
-    },
-    {
-     "team": "MEM",
-     "status": "one game",
-     "side": "Under",
-     "last": 0.96,
-     "prev": 0.3,
-     "last_date": "2026-11-11",
-     "last_opp": "DEN",
-     "won": false
     },
     {
      "team": "WSH",
@@ -312,22 +375,12 @@
     {
      "team": "NY",
      "status": "one game",
-     "side": "Under",
-     "last": 0.92,
-     "prev": 0.31,
-     "last_date": "2026-11-11",
-     "last_opp": "CLE",
+     "side": "Over",
+     "last": -0.91,
+     "prev": 0.79,
+     "last_date": "2026-11-13",
+     "last_opp": "IND",
      "won": false
-    },
-    {
-     "team": "MIA",
-     "status": "one game",
-     "side": "Under",
-     "last": 0.8,
-     "prev": 0.58,
-     "last_date": "2026-11-10",
-     "last_opp": "UTAH",
-     "won": true
     }
    ]
   }
