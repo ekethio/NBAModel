@@ -1,6 +1,6 @@
 {
- "updatedAt": "2026-11-15 20:04 ET",
- "today": "2026-11-15",
+ "updatedAt": "2026-11-16 18:46 ET",
+ "today": "2026-11-16",
  "models": {
   "A": {
    "record": {
@@ -11,11 +11,21 @@
    },
    "passed_record": {
     "w": 0,
-    "l": 0,
+    "l": 1,
     "p": 0,
-    "units": 0.0
+    "units": -1.0
    },
    "history": [
+    {
+     "id": "401909995",
+     "date": "2026-11-16",
+     "tip": "2026-11-17T00:00Z",
+     "matchup": "CHI @ CLE",
+     "side": "Under",
+     "line": 241.5,
+     "posted": "2026-11-16 18:46 ET",
+     "passed": false
+    },
     {
      "id": "401909990",
      "date": "2026-11-15",
@@ -24,7 +34,9 @@
      "side": "Under",
      "line": 217.5,
      "posted": "2026-11-15 15:26 ET",
-     "passed": true
+     "passed": true,
+     "final": 220,
+     "result": "L"
     },
     {
      "id": "401909984",
@@ -71,13 +83,13 @@
      "won": true
     },
     {
-     "team": "TOR",
-     "status": "triggered",
+     "team": "DAL",
+     "status": "one game",
      "side": "Under",
-     "last": 0.88,
-     "prev": 1.24,
-     "last_date": "2026-11-12",
-     "last_opp": "PHI",
+     "last": 1.87,
+     "prev": -1.13,
+     "last_date": "2026-11-15",
+     "last_opp": "BOS",
      "won": false
     },
     {
@@ -101,6 +113,16 @@
      "won": true
     },
     {
+     "team": "WSH",
+     "status": "one game",
+     "side": "Over",
+     "last": -1.54,
+     "prev": 0.98,
+     "last_date": "2026-11-15",
+     "last_opp": "HOU",
+     "won": false
+    },
+    {
      "team": "CHA",
      "status": "one game",
      "side": "Over",
@@ -121,16 +143,6 @@
      "won": false
     },
     {
-     "team": "DAL",
-     "status": "one game",
-     "side": "Over",
-     "last": -1.14,
-     "prev": 0.22,
-     "last_date": "2026-11-14",
-     "last_opp": "CLE",
-     "won": false
-    },
-    {
      "team": "DET",
      "status": "one game",
      "side": "Over",
@@ -141,14 +153,14 @@
      "won": false
     },
     {
-     "team": "WSH",
+     "team": "HOU",
      "status": "one game",
-     "side": "Under",
-     "last": 1.03,
-     "prev": -0.6,
-     "last_date": "2026-11-12",
-     "last_opp": "DET",
-     "won": false
+     "side": "Over",
+     "last": -0.82,
+     "prev": -0.07,
+     "last_date": "2026-11-15",
+     "last_opp": "WSH",
+     "won": true
     }
    ]
   },
@@ -166,6 +178,36 @@
     "units": 4.27
    },
    "history": [
+    {
+     "id": "401909999",
+     "date": "2026-11-16",
+     "tip": "2026-11-17T01:00Z",
+     "matchup": "POR @ MIN",
+     "side": "Over",
+     "line": 227.5,
+     "posted": "2026-11-16 18:46 ET",
+     "passed": true
+    },
+    {
+     "id": "401909997",
+     "date": "2026-11-16",
+     "tip": "2026-11-17T00:30Z",
+     "matchup": "PHI @ BKN",
+     "side": "Over",
+     "line": 226.5,
+     "posted": "2026-11-16 18:46 ET",
+     "passed": false
+    },
+    {
+     "id": "401909995",
+     "date": "2026-11-16",
+     "tip": "2026-11-17T00:00Z",
+     "matchup": "CHI @ CLE",
+     "side": "Under",
+     "line": 241.5,
+     "posted": "2026-11-16 18:46 ET",
+     "passed": false
+    },
     {
      "id": "401909303",
      "date": "2026-11-13",
@@ -385,6 +427,16 @@
      "won": true
     },
     {
+     "team": "DAL",
+     "status": "one game",
+     "side": "Under",
+     "last": 1.88,
+     "prev": -1.12,
+     "last_date": "2026-11-15",
+     "last_opp": "BOS",
+     "won": false
+    },
+    {
      "team": "LAC",
      "status": "one game",
      "side": "Under",
@@ -393,6 +445,16 @@
      "last_date": "2026-11-15",
      "last_opp": "CHA",
      "won": true
+    },
+    {
+     "team": "WSH",
+     "status": "one game",
+     "side": "Over",
+     "last": -1.36,
+     "prev": 1.16,
+     "last_date": "2026-11-15",
+     "last_opp": "HOU",
+     "won": false
     },
     {
      "team": "CHA",
@@ -435,34 +497,14 @@
      "won": false
     },
     {
-     "team": "WSH",
-     "status": "one game",
-     "side": "Under",
-     "last": 0.95,
-     "prev": -0.68,
-     "last_date": "2026-11-12",
-     "last_opp": "DET",
-     "won": false
-    },
-    {
-     "team": "NY",
+     "team": "HOU",
      "status": "one game",
      "side": "Over",
-     "last": -0.91,
-     "prev": 0.79,
-     "last_date": "2026-11-13",
-     "last_opp": "IND",
-     "won": false
-    },
-    {
-     "team": "DAL",
-     "status": "one game",
-     "side": "Over",
-     "last": -0.91,
-     "prev": 0.46,
-     "last_date": "2026-11-14",
-     "last_opp": "CLE",
-     "won": false
+     "last": -0.86,
+     "prev": -0.11,
+     "last_date": "2026-11-15",
+     "last_opp": "WSH",
+     "won": true
     }
    ]
   }
