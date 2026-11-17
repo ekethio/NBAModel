@@ -1,6 +1,6 @@
 {
- "updatedAt": "2026-11-16 22:55 ET",
- "today": "2026-11-16",
+ "updatedAt": "2026-11-17 15:36 ET",
+ "today": "2026-11-17",
  "models": {
   "A": {
    "record": {
@@ -105,6 +105,16 @@
      "won": false
     },
     {
+     "team": "PHX",
+     "status": "one game",
+     "side": "Under",
+     "last": 1.13,
+     "prev": -0.57,
+     "last_date": "2026-11-16",
+     "last_opp": "DEN",
+     "won": true
+    },
+    {
      "team": "DET",
      "status": "one game",
      "side": "Over",
@@ -123,6 +133,16 @@
      "last_date": "2026-11-16",
      "last_opp": "BKN",
      "won": true
+    },
+    {
+     "team": "DEN",
+     "status": "one game",
+     "side": "Over",
+     "last": -0.96,
+     "prev": 0.67,
+     "last_date": "2026-11-16",
+     "last_opp": "PHX",
+     "won": false
     },
     {
      "team": "POR",
@@ -160,6 +180,26 @@
     "units": 3.27
    },
    "history": [
+    {
+     "id": "401910005",
+     "date": "2026-11-17",
+     "tip": "2026-11-18T04:00Z",
+     "matchup": "CHA @ LAL",
+     "side": "Over",
+     "line": 221.5,
+     "posted": "2026-11-17 15:36 ET",
+     "passed": false
+    },
+    {
+     "id": "401910004",
+     "date": "2026-11-17",
+     "tip": "2026-11-18T01:00Z",
+     "matchup": "DET @ SA",
+     "side": "Over",
+     "line": 222.5,
+     "posted": "2026-11-17 15:36 ET",
+     "passed": false
+    },
     {
      "id": "401909999",
      "date": "2026-11-16",
@@ -445,6 +485,16 @@
      "won": false
     },
     {
+     "team": "DEN",
+     "status": "one game",
+     "side": "Over",
+     "last": -1.06,
+     "prev": 0.57,
+     "last_date": "2026-11-16",
+     "last_opp": "PHX",
+     "won": false
+    },
+    {
      "team": "DET",
      "status": "one game",
      "side": "Over",
@@ -453,6 +503,16 @@
      "last_date": "2026-11-14",
      "last_opp": "MIA",
      "won": false
+    },
+    {
+     "team": "PHX",
+     "status": "one game",
+     "side": "Under",
+     "last": 0.97,
+     "prev": -0.73,
+     "last_date": "2026-11-16",
+     "last_opp": "DEN",
+     "won": true
     },
     {
      "team": "PHI",
