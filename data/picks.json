@@ -1,13 +1,13 @@
 {
- "updatedAt": "2026-11-18 21:36 ET",
- "today": "2026-11-18",
+ "updatedAt": "2026-11-19 17:42 ET",
+ "today": "2026-11-19",
  "models": {
   "A": {
    "record": {
-    "w": 1,
+    "w": 2,
     "l": 1,
     "p": 0,
-    "units": -0.09
+    "units": 0.82
    },
    "passed_record": {
     "w": 0,
@@ -24,7 +24,9 @@
      "side": "Under",
      "line": 231.5,
      "posted": "2026-11-18 17:38 ET",
-     "passed": false
+     "passed": false,
+     "final": 206,
+     "result": "W"
     },
     {
      "id": "401909995",
@@ -65,14 +67,14 @@
    ],
    "watch": [
     {
-     "team": "UTAH",
+     "team": "TOR",
      "status": "triggered",
      "side": "Under",
-     "last": 1.55,
-     "prev": 1.26,
-     "last_date": "2026-11-17",
-     "last_opp": "LAC",
-     "won": true
+     "last": 1.89,
+     "prev": 1.48,
+     "last_date": "2026-11-18",
+     "last_opp": "WSH",
+     "won": false
     },
     {
      "team": "HOU",
@@ -86,22 +88,22 @@
     },
     {
      "team": "BKN",
-     "status": "one game",
+     "status": "triggered",
      "side": "Over",
-     "last": -2.05,
-     "prev": 0.27,
-     "last_date": "2026-11-16",
-     "last_opp": "PHI",
+     "last": -1.27,
+     "prev": -2.27,
+     "last_date": "2026-11-18",
+     "last_opp": "CHI",
      "won": false
     },
     {
-     "team": "DAL",
+     "team": "LAL",
      "status": "one game",
-     "side": "Under",
-     "last": 1.87,
-     "prev": -1.13,
-     "last_date": "2026-11-15",
-     "last_opp": "BOS",
+     "side": "Over",
+     "last": -1.96,
+     "prev": 0.15,
+     "last_date": "2026-11-18",
+     "last_opp": "UTAH",
      "won": false
     },
     {
@@ -113,16 +115,6 @@
      "last_date": "2026-11-17",
      "last_opp": "TOR",
      "won": true
-    },
-    {
-     "team": "TOR",
-     "status": "one game",
-     "side": "Under",
-     "last": 1.45,
-     "prev": 0.1,
-     "last_date": "2026-11-17",
-     "last_opp": "NY",
-     "won": false
     },
     {
      "team": "SA",
@@ -155,24 +147,14 @@
      "won": false
     },
     {
-     "team": "PHX",
-     "status": "one game",
-     "side": "Under",
-     "last": 1.13,
-     "prev": -0.57,
-     "last_date": "2026-11-16",
-     "last_opp": "DEN",
-     "won": true
-    },
-    {
-     "team": "DEN",
+     "team": "MIA",
      "status": "one game",
      "side": "Over",
-     "last": -0.96,
-     "prev": 0.67,
-     "last_date": "2026-11-16",
-     "last_opp": "PHX",
-     "won": false
+     "last": -0.94,
+     "prev": -0.27,
+     "last_date": "2026-11-18",
+     "last_opp": "MIL",
+     "won": true
     },
     {
      "team": "CHA",
@@ -182,6 +164,16 @@
      "prev": -1.2,
      "last_date": "2026-11-17",
      "last_opp": "LAL",
+     "won": false
+    },
+    {
+     "team": "NO",
+     "status": "one game",
+     "side": "Under",
+     "last": 0.91,
+     "prev": -0.64,
+     "last_date": "2026-11-18",
+     "last_opp": "DET",
      "won": false
     },
     {
@@ -198,10 +190,10 @@
   },
   "B": {
    "record": {
-    "w": 4,
+    "w": 5,
     "l": 2,
     "p": 0,
-    "units": 1.64
+    "units": 2.55
    },
    "passed_record": {
     "w": 8,
@@ -218,7 +210,9 @@
      "side": "Under",
      "line": 231.5,
      "posted": "2026-11-18 17:38 ET",
-     "passed": false
+     "passed": false,
+     "final": 206,
+     "result": "W"
     },
     {
      "id": "401910005",
@@ -439,14 +433,14 @@
    ],
    "watch": [
     {
-     "team": "UTAH",
+     "team": "TOR",
      "status": "triggered",
      "side": "Under",
-     "last": 1.53,
-     "prev": 1.24,
-     "last_date": "2026-11-17",
-     "last_opp": "LAC",
-     "won": true
+     "last": 1.52,
+     "prev": 1.12,
+     "last_date": "2026-11-18",
+     "last_opp": "WSH",
+     "won": false
     },
     {
      "team": "HOU",
@@ -460,22 +454,22 @@
     },
     {
      "team": "BKN",
-     "status": "one game",
+     "status": "triggered",
      "side": "Over",
-     "last": -2.35,
-     "prev": -0.03,
-     "last_date": "2026-11-16",
-     "last_opp": "PHI",
+     "last": -1.25,
+     "prev": -2.25,
+     "last_date": "2026-11-18",
+     "last_opp": "CHI",
      "won": false
     },
     {
-     "team": "DAL",
+     "team": "LAL",
      "status": "one game",
-     "side": "Under",
-     "last": 1.88,
-     "prev": -1.12,
-     "last_date": "2026-11-15",
-     "last_opp": "BOS",
+     "side": "Over",
+     "last": -1.76,
+     "prev": 0.35,
+     "last_date": "2026-11-18",
+     "last_opp": "UTAH",
      "won": false
     },
     {
@@ -499,16 +493,6 @@
      "won": true
     },
     {
-     "team": "TOR",
-     "status": "one game",
-     "side": "Under",
-     "last": 1.25,
-     "prev": -0.1,
-     "last_date": "2026-11-17",
-     "last_opp": "NY",
-     "won": false
-    },
-    {
      "team": "SA",
      "status": "one game",
      "side": "Under",
@@ -519,14 +503,14 @@
      "won": false
     },
     {
-     "team": "DEN",
+     "team": "MIA",
      "status": "one game",
      "side": "Over",
-     "last": -1.06,
-     "prev": 0.57,
-     "last_date": "2026-11-16",
-     "last_opp": "PHX",
-     "won": false
+     "last": -1.1,
+     "prev": -0.43,
+     "last_date": "2026-11-18",
+     "last_opp": "MIL",
+     "won": true
     },
     {
      "team": "CLE",
@@ -539,24 +523,24 @@
      "won": false
     },
     {
-     "team": "PHX",
+     "team": "NO",
      "status": "one game",
      "side": "Under",
-     "last": 0.97,
-     "prev": -0.73,
-     "last_date": "2026-11-16",
-     "last_opp": "DEN",
-     "won": true
+     "last": 0.93,
+     "prev": -0.62,
+     "last_date": "2026-11-18",
+     "last_opp": "DET",
+     "won": false
     },
     {
-     "team": "DET",
+     "team": "OKC",
      "status": "one game",
      "side": "Under",
-     "last": 0.94,
-     "prev": -0.66,
-     "last_date": "2026-11-17",
-     "last_opp": "SA",
-     "won": true
+     "last": 0.88,
+     "prev": 0.44,
+     "last_date": "2026-11-18",
+     "last_opp": "ATL",
+     "won": false
     }
    ]
   }
