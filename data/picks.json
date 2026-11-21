@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-20 17:16 ET",
+ "updatedAt": "2026-11-20 21:19 ET",
  "today": "2026-11-20",
  "models": {
   "A": {
@@ -185,16 +185,6 @@
      "last_date": "2026-11-18",
      "last_opp": "MIL",
      "won": true
-    },
-    {
-     "team": "CHA",
-     "status": "one game",
-     "side": "Under",
-     "last": 0.94,
-     "prev": -1.2,
-     "last_date": "2026-11-17",
-     "last_opp": "LAL",
-     "won": false
     },
     {
      "team": "NO",
