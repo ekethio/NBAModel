@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-22 16:07 ET",
+ "updatedAt": "2026-11-22 20:46 ET",
  "today": "2026-11-22",
  "models": {
   "A": {
@@ -223,26 +223,6 @@
      "last_date": "2026-11-20",
      "last_opp": "SAC",
      "won": true
-    },
-    {
-     "team": "MIA",
-     "status": "one game",
-     "side": "Over",
-     "last": -0.94,
-     "prev": -0.27,
-     "last_date": "2026-11-18",
-     "last_opp": "MIL",
-     "won": true
-    },
-    {
-     "team": "DET",
-     "status": "one game",
-     "side": "Under",
-     "last": 0.91,
-     "prev": 0.33,
-     "last_date": "2026-11-20",
-     "last_opp": "TOR",
-     "won": false
     }
    ]
   },
@@ -616,26 +596,6 @@
      "prev": 0.31,
      "last_date": "2026-11-21",
      "last_opp": "MEM",
-     "won": true
-    },
-    {
-     "team": "DET",
-     "status": "one game",
-     "side": "Under",
-     "last": 1.13,
-     "prev": 0.54,
-     "last_date": "2026-11-20",
-     "last_opp": "TOR",
-     "won": false
-    },
-    {
-     "team": "MIA",
-     "status": "one game",
-     "side": "Over",
-     "last": -1.1,
-     "prev": -0.43,
-     "last_date": "2026-11-18",
-     "last_opp": "MIL",
      "won": true
     },
     {
