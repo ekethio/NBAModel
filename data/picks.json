@@ -1,19 +1,19 @@
 {
- "updatedAt": "2026-11-23 21:24 ET",
- "today": "2026-11-23",
+ "updatedAt": "2026-11-24 00:20 ET",
+ "today": "2026-11-24",
  "models": {
   "A": {
    "record": {
     "w": 3,
-    "l": 2,
+    "l": 3,
     "p": 0,
-    "units": 0.73
+    "units": -0.27
    },
    "passed_record": {
-    "w": 3,
+    "w": 5,
     "l": 1,
     "p": 0,
-    "units": 1.73
+    "units": 3.55
    },
    "history": [
     {
@@ -24,7 +24,9 @@
      "side": "Under",
      "line": 242.5,
      "posted": "2026-11-23 18:05 ET",
-     "passed": true
+     "passed": true,
+     "final": 230,
+     "result": "W"
     },
     {
      "id": "401910039",
@@ -34,7 +36,9 @@
      "side": "Under",
      "line": 222.5,
      "posted": "2026-11-23 18:05 ET",
-     "passed": false
+     "passed": false,
+     "final": 227,
+     "result": "L"
     },
     {
      "id": "401910040",
@@ -44,7 +48,9 @@
      "side": "Over",
      "line": 222.5,
      "posted": "2026-11-23 18:05 ET",
-     "passed": true
+     "passed": true,
+     "final": 258,
+     "result": "W"
     },
     {
      "id": "401910034",
@@ -157,36 +163,6 @@
    ],
    "watch": [
     {
-     "team": "TOR",
-     "status": "triggered",
-     "side": "Under",
-     "last": 2.35,
-     "prev": 1.66,
-     "last_date": "2026-11-20",
-     "last_opp": "DET",
-     "won": true
-    },
-    {
-     "team": "CHI",
-     "status": "triggered",
-     "side": "Under",
-     "last": 1.01,
-     "prev": 1.03,
-     "last_date": "2026-11-22",
-     "last_opp": "DEN",
-     "won": false
-    },
-    {
-     "team": "BKN",
-     "status": "triggered",
-     "side": "Over",
-     "last": -0.81,
-     "prev": -1.11,
-     "last_date": "2026-11-20",
-     "last_opp": "ORL",
-     "won": false
-    },
-    {
      "team": "SAC",
      "status": "one game",
      "side": "Over",
@@ -197,16 +173,6 @@
      "won": true
     },
     {
-     "team": "NO",
-     "status": "one game",
-     "side": "Under",
-     "last": 1.85,
-     "prev": 0.53,
-     "last_date": "2026-11-21",
-     "last_opp": "SA",
-     "won": false
-    },
-    {
      "team": "BOS",
      "status": "one game",
      "side": "Under",
@@ -215,16 +181,6 @@
      "last_date": "2026-11-22",
      "last_opp": "GS",
      "won": false
-    },
-    {
-     "team": "MIN",
-     "status": "one game",
-     "side": "Under",
-     "last": 1.3,
-     "prev": 0.27,
-     "last_date": "2026-11-21",
-     "last_opp": "MEM",
-     "won": true
     },
     {
      "team": "ORL",
@@ -281,9 +237,9 @@
   "B": {
    "record": {
     "w": 6,
-    "l": 3,
+    "l": 4,
     "p": 0,
-    "units": 2.45
+    "units": 1.45
    },
    "passed_record": {
     "w": 11,
@@ -300,7 +256,9 @@
      "side": "Under",
      "line": 222.5,
      "posted": "2026-11-23 18:05 ET",
-     "passed": false
+     "passed": false,
+     "final": 227,
+     "result": "L"
     },
     {
      "id": "401910034",
@@ -593,16 +551,6 @@
    ],
    "watch": [
     {
-     "team": "TOR",
-     "status": "triggered",
-     "side": "Under",
-     "last": 1.83,
-     "prev": 1.14,
-     "last_date": "2026-11-20",
-     "last_opp": "DET",
-     "won": true
-    },
-    {
      "team": "SAC",
      "status": "one game",
      "side": "Over",
@@ -613,16 +561,6 @@
      "won": true
     },
     {
-     "team": "NO",
-     "status": "one game",
-     "side": "Under",
-     "last": 1.98,
-     "prev": 0.67,
-     "last_date": "2026-11-21",
-     "last_opp": "SA",
-     "won": false
-    },
-    {
      "team": "BOS",
      "status": "one game",
      "side": "Under",
@@ -631,16 +569,6 @@
      "last_date": "2026-11-22",
      "last_opp": "GS",
      "won": false
-    },
-    {
-     "team": "MIN",
-     "status": "one game",
-     "side": "Under",
-     "last": 1.35,
-     "prev": 0.31,
-     "last_date": "2026-11-21",
-     "last_opp": "MEM",
-     "won": true
     },
     {
      "team": "UTAH",
@@ -681,16 +609,6 @@
      "last_date": "2026-11-20",
      "last_opp": "SAC",
      "won": true
-    },
-    {
-     "team": "MIL",
-     "status": "one game",
-     "side": "Over",
-     "last": -0.9,
-     "prev": -0.39,
-     "last_date": "2026-11-21",
-     "last_opp": "PHI",
-     "won": false
     },
     {
      "team": "GS",
