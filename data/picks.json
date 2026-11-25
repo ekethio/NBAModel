@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-24 18:57 ET",
+ "updatedAt": "2026-11-24 23:14 ET",
  "today": "2026-11-24",
  "models": {
   "A": {
@@ -183,26 +183,6 @@
      "won": false
     },
     {
-     "team": "BOS",
-     "status": "one game",
-     "side": "Under",
-     "last": 1.51,
-     "prev": 0.22,
-     "last_date": "2026-11-22",
-     "last_opp": "GS",
-     "won": false
-    },
-    {
-     "team": "ORL",
-     "status": "one game",
-     "side": "Over",
-     "last": -1.17,
-     "prev": 1.11,
-     "last_date": "2026-11-22",
-     "last_opp": "WSH",
-     "won": false
-    },
-    {
      "team": "LAL",
      "status": "one game",
      "side": "Over",
@@ -215,12 +195,12 @@
     {
      "team": "WSH",
      "status": "one game",
-     "side": "Under",
-     "last": 0.88,
-     "prev": -0.59,
-     "last_date": "2026-11-22",
-     "last_opp": "ORL",
-     "won": true
+     "side": "Over",
+     "last": -0.84,
+     "prev": 1.03,
+     "last_date": "2026-11-24",
+     "last_opp": "BOS",
+     "won": false
     },
     {
      "team": "GS",
@@ -231,6 +211,16 @@
      "last_date": "2026-11-22",
      "last_opp": "BOS",
      "won": true
+    },
+    {
+     "team": "ORL",
+     "status": "one game",
+     "side": "Over",
+     "last": -0.8,
+     "prev": -1.11,
+     "last_date": "2026-11-24",
+     "last_opp": "DET",
+     "won": false
     }
    ]
   },
@@ -571,33 +561,13 @@
      "won": false
     },
     {
-     "team": "BOS",
-     "status": "one game",
-     "side": "Under",
-     "last": 1.42,
-     "prev": 0.13,
-     "last_date": "2026-11-22",
-     "last_opp": "GS",
-     "won": false
-    },
-    {
-     "team": "WSH",
-     "status": "one game",
-     "side": "Under",
-     "last": 0.96,
-     "prev": -0.52,
-     "last_date": "2026-11-22",
-     "last_opp": "ORL",
-     "won": true
-    },
-    {
      "team": "ORL",
-     "status": "one game",
+     "status": "triggered",
      "side": "Over",
-     "last": -0.93,
-     "prev": 1.34,
-     "last_date": "2026-11-22",
-     "last_opp": "WSH",
+     "last": -0.91,
+     "prev": -1.23,
+     "last_date": "2026-11-24",
+     "last_opp": "DET",
      "won": false
     },
     {
