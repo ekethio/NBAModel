@@ -1,6 +1,6 @@
 {
- "updatedAt": "2026-11-24 23:14 ET",
- "today": "2026-11-24",
+ "updatedAt": "2026-11-25 15:33 ET",
+ "today": "2026-11-25",
  "models": {
   "A": {
    "record": {
@@ -16,6 +16,16 @@
     "units": 3.55
    },
    "history": [
+    {
+     "id": "401909324",
+     "date": "2026-11-25",
+     "tip": "2026-11-26T03:00Z",
+     "matchup": "SAC @ GS",
+     "side": "Over",
+     "line": 216.5,
+     "posted": "2026-11-25 15:33 ET",
+     "passed": true
+    },
     {
      "id": "401910041",
      "date": "2026-11-23",
@@ -193,6 +203,16 @@
      "won": true
     },
     {
+     "team": "DAL",
+     "status": "one game",
+     "side": "Under",
+     "last": 0.86,
+     "prev": -0.2,
+     "last_date": "2026-11-24",
+     "last_opp": "DEN",
+     "won": true
+    },
+    {
      "team": "WSH",
      "status": "one game",
      "side": "Over",
@@ -238,6 +258,16 @@
     "units": 6.0
    },
    "history": [
+    {
+     "id": "401909324",
+     "date": "2026-11-25",
+     "tip": "2026-11-26T03:00Z",
+     "matchup": "SAC @ GS",
+     "side": "Over",
+     "line": 216.5,
+     "posted": "2026-11-25 15:33 ET",
+     "passed": true
+    },
     {
      "id": "401910039",
      "date": "2026-11-23",
