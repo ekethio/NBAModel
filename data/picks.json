@@ -1,6 +1,6 @@
 {
- "updatedAt": "2026-11-25 22:36 ET",
- "today": "2026-11-25",
+ "updatedAt": "2026-11-26 18:55 ET",
+ "today": "2026-11-26",
  "models": {
   "A": {
    "record": {
@@ -10,10 +10,10 @@
     "units": -0.27
    },
    "passed_record": {
-    "w": 5,
+    "w": 6,
     "l": 1,
     "p": 0,
-    "units": 3.55
+    "units": 4.45
    },
    "history": [
     {
@@ -24,7 +24,9 @@
      "side": "Over",
      "line": 216.5,
      "posted": "2026-11-25 15:33 ET",
-     "passed": true
+     "passed": true,
+     "final": 239,
+     "result": "W"
     },
     {
      "id": "401910041",
@@ -183,13 +185,13 @@
      "won": false
     },
     {
-     "team": "SAC",
-     "status": "triggered",
-     "side": "Over",
-     "last": -0.91,
-     "prev": -2.29,
-     "last_date": "2026-11-23",
-     "last_opp": "SA",
+     "team": "SA",
+     "status": "one game",
+     "side": "Under",
+     "last": 1.29,
+     "prev": -0.05,
+     "last_date": "2026-11-25",
+     "last_opp": "POR",
      "won": false
     },
     {
@@ -203,6 +205,16 @@
      "won": true
     },
     {
+     "team": "POR",
+     "status": "one game",
+     "side": "Over",
+     "last": -0.97,
+     "prev": 0.03,
+     "last_date": "2026-11-25",
+     "last_opp": "SA",
+     "won": true
+    },
+    {
      "team": "DAL",
      "status": "one game",
      "side": "Under",
@@ -211,6 +223,16 @@
      "last_date": "2026-11-24",
      "last_opp": "DEN",
      "won": true
+    },
+    {
+     "team": "PHX",
+     "status": "one game",
+     "side": "Over",
+     "last": -0.86,
+     "prev": -0.64,
+     "last_date": "2026-11-25",
+     "last_opp": "HOU",
+     "won": false
     },
     {
      "team": "WSH",
@@ -231,16 +253,6 @@
      "last_date": "2026-11-25",
      "last_opp": "NY",
      "won": false
-    },
-    {
-     "team": "GS",
-     "status": "one game",
-     "side": "Under",
-     "last": 0.81,
-     "prev": 0.5,
-     "last_date": "2026-11-22",
-     "last_opp": "BOS",
-     "won": true
     },
     {
      "team": "ORL",
@@ -272,10 +284,10 @@
     "units": 1.45
    },
    "passed_record": {
-    "w": 11,
+    "w": 12,
     "l": 4,
     "p": 0,
-    "units": 6.0
+    "units": 6.91
    },
    "history": [
     {
@@ -286,7 +298,9 @@
      "side": "Over",
      "line": 216.5,
      "posted": "2026-11-25 15:33 ET",
-     "passed": true
+     "passed": true,
+     "final": 239,
+     "result": "W"
     },
     {
      "id": "401910039",
@@ -601,16 +615,6 @@
      "won": false
     },
     {
-     "team": "SAC",
-     "status": "triggered",
-     "side": "Over",
-     "last": -0.93,
-     "prev": -2.31,
-     "last_date": "2026-11-23",
-     "last_opp": "SA",
-     "won": false
-    },
-    {
      "team": "ORL",
      "status": "triggered",
      "side": "Over",
@@ -618,6 +622,16 @@
      "prev": -1.23,
      "last_date": "2026-11-24",
      "last_opp": "DET",
+     "won": false
+    },
+    {
+     "team": "SA",
+     "status": "one game",
+     "side": "Under",
+     "last": 1.51,
+     "prev": 0.17,
+     "last_date": "2026-11-25",
+     "last_opp": "POR",
      "won": false
     },
     {
@@ -631,14 +645,24 @@
      "won": false
     },
     {
-     "team": "GS",
+     "team": "POR",
      "status": "one game",
-     "side": "Under",
-     "last": 0.81,
-     "prev": 0.49,
-     "last_date": "2026-11-22",
-     "last_opp": "BOS",
+     "side": "Over",
+     "last": -1.01,
+     "prev": -0.02,
+     "last_date": "2026-11-25",
+     "last_opp": "SA",
      "won": true
+    },
+    {
+     "team": "PHX",
+     "status": "one game",
+     "side": "Over",
+     "last": -0.85,
+     "prev": -0.63,
+     "last_date": "2026-11-25",
+     "last_opp": "HOU",
+     "won": false
     }
    ]
   }
