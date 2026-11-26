@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-25 18:41 ET",
+ "updatedAt": "2026-11-25 22:36 ET",
  "today": "2026-11-25",
  "models": {
   "A": {
@@ -223,6 +223,16 @@
      "won": false
     },
     {
+     "team": "CLE",
+     "status": "one game",
+     "side": "Over",
+     "last": -0.82,
+     "prev": -0.28,
+     "last_date": "2026-11-25",
+     "last_opp": "NY",
+     "won": false
+    },
+    {
      "team": "GS",
      "status": "one game",
      "side": "Under",
@@ -241,6 +251,16 @@
      "last_date": "2026-11-24",
      "last_opp": "DET",
      "won": false
+    },
+    {
+     "team": "CHI",
+     "status": "one game",
+     "side": "Under",
+     "last": 0.8,
+     "prev": 0.25,
+     "last_date": "2026-11-25",
+     "last_opp": "CHA",
+     "won": true
     }
    ]
   },
@@ -598,6 +618,16 @@
      "prev": -1.23,
      "last_date": "2026-11-24",
      "last_opp": "DET",
+     "won": false
+    },
+    {
+     "team": "CLE",
+     "status": "one game",
+     "side": "Over",
+     "last": -1.09,
+     "prev": -0.54,
+     "last_date": "2026-11-25",
+     "last_opp": "NY",
      "won": false
     },
     {
