@@ -203,17 +203,6 @@ lg = [v['tts'] for g in games.values() for v in g.get('tts', {}).values()]
 if lg:
     print(f"  League time to shot so far: {sum(lg) / len(lg):.2f} s over {len(lg)} team-games")
 
-FAST_MARGIN = 0.3   # seconds quicker than league average, season to date before the two trigger games
-
-def fast_team(team):
-    """Whether the team was already clearly fast before its two trigger games. A fast team getting faster
-    (2020-21 to 2025-26 backtest: Model A overs 51-34, Model B 59-44) is counted even after a loss."""
-    hist = log.get(team, [])
-    if len(hist) < 7 or not lg:
-        return False
-    before = [x[2] for x in hist[:-2]]
-    return sum(before) / len(before) <= sum(lg) / len(lg) - FAST_MARGIN
-
 def grade(history):
     for p in history.values():
         g = games.get(p['id'])
@@ -245,19 +234,14 @@ for name, n in MODELS.items():
         side = 'Over' if dh + da > 0 else 'Under'
         # Shifts carried by a team that just lost have been close to break-even: pass on those, but keep grading them
         shifters = [t for t, d in ((g['home'], dh), (g['away'], da)) if d]
-        # Fast+: an over where every shifting team was already clearly fast; counted even after a loss
-        fast = side == 'Over' and all(fast_team(t) for t in shifters)
-        passed = not fast and not all(won_last(t) for t in shifters)
+        passed = not all(won_last(t) for t in shifters)
         p = history.get(g['id'])
         if p is None:
             history[g['id']] = {'id': g['id'], 'date': g['date'], 'tip': g['tip'],
                                 'matchup': f"{g['away']} @ {g['home']}", 'side': side,
-                                'line': g['line'], 'posted': now, 'passed': passed, 'fast': fast}
-        else:
-            if p.get('line') is None and g['line'] is not None:
-                p['line'] = g['line']
-            if not p.get('result') and fast and not p.get('fast'):
-                p['fast'], p['passed'] = True, False
+                                'line': g['line'], 'posted': now, 'passed': passed}
+        elif p.get('line') is None and g['line'] is not None:
+            p['line'] = g['line']
     grade(history)
     hist = sorted(history.values(), key=lambda p: (p['date'], p['tip']), reverse=True)
 
