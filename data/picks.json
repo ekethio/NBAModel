@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-27 18:20 ET",
+ "updatedAt": "2026-11-27 18:21 ET",
  "today": "2026-11-27",
  "models": {
   "A": {
@@ -687,6 +687,22 @@
      "won": false
     }
    ]
+  },
+  "F": {
+   "record": {
+    "w": 0,
+    "l": 0,
+    "p": 0,
+    "units": 0.0
+   },
+   "passed_record": {
+    "w": 0,
+    "l": 0,
+    "p": 0,
+    "units": 0
+   },
+   "history": [],
+   "watch": []
   }
  }
 }
