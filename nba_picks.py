@@ -43,6 +43,8 @@ def clock_secs(s):
     return float(s)
 
 # ── Time to shot per team from one game's play-by-play ──────────────────────
+START_GROUPS = ('made', 'dreb', 'steal', 'deadtov')
+
 def game_tts(summary):
     comp = summary['header']['competitions'][0]
     abbr = {c['team']['id']: c['team']['abbreviation'] for c in comp['competitors']}
@@ -65,13 +67,13 @@ def game_tts(summary):
     bounds, last_miss = [], None
     for i, r in enumerate(rows):
         if i == 0 or r['per'] != rows[i - 1]['per']:
-            bounds.append((i, 720.0 if r['per'] <= 4 else 300.0, 'start', None))
+            bounds.append((i, 720.0 if r['per'] <= 4 else 300.0, 'start', None, 'made'))
             last_miss = None
         ft = 'free throw' in r['typ'] or 'free throw' in r['txt']
         special = any(k in r['typ'] or k in r['txt'] for k in ('technical', 'flagrant', 'clear path'))
         if r['shot'] and not ft:
             if r['made']:
-                bounds.append((i, r['rem'], 'made', r['team']))
+                bounds.append((i, r['rem'], 'made', r['team'], 'made'))
             else:
                 last_miss = r['rem']
         elif ft and not special:
@@ -80,21 +82,22 @@ def game_tts(summary):
                 bounds.pop()                                   # and-one: possession ends on the free throw
             if m and m.group(1) == m.group(2):
                 if r['made']:
-                    bounds.append((i, r['rem'], 'made', r['team']))
+                    bounds.append((i, r['rem'], 'made', r['team'], 'made'))
                 else:
                     last_miss = r['rem']
         elif 'rebound' in r['typ'] and 'defensive' in (r['typ'] + r['txt']):
             # Rebounds are timed at the miss so older and newer ESPN logging line up
             rem = last_miss if last_miss is not None else r['rem']
-            bounds.append((i, rem, 'dreb', r['team']))
+            bounds.append((i, rem, 'dreb', r['team'], 'dreb'))
             last_miss = None
         elif ('turnover' in r['typ'] or 'turnover' in r['txt'] or r['typ'] in ('traveling', 'offensive charge')
               or r['typ'].startswith('offensive foul')):
-            bounds.append((i, r['rem'], 'tov', r['team']))
+            live = 'steal' in r['txt'] or (i + 1 < len(rows) and 'steal' in rows[i + 1]['typ'])
+            bounds.append((i, r['rem'], 'tov', r['team'], 'steal' if live else 'deadtov'))
 
     teams = list(abbr)
     out = {t: [] for t in teams}
-    for k, (i, rem0, kind, who) in enumerate(bounds):
+    for k, (i, rem0, kind, who, group) in enumerate(bounds):
         # the event that ends this possession (often its shot) belongs to it
         end_i = min(bounds[k + 1][0] + 1, len(rows)) if k + 1 < len(bounds) else len(rows)
         per = rows[i]['per']
@@ -117,9 +120,17 @@ def game_tts(summary):
         tts = rem0 - fga['rem']
         if late or blowout or not (0 <= tts <= 24):
             continue
-        out[fga['team']].append(tts)
+        out[fga['team']].append((tts, group))
 
-    return {abbr[t]: {'tts': round(sum(v) / len(v), 3), 'n': len(v)} for t, v in out.items() if len(v) >= 30}
+    def groups(v):
+        # mean time to shot and count by how the possession started, for the mix-adjusted measure
+        res = {}
+        for gname in START_GROUPS:
+            x = [t for t, gg in v if gg == gname]
+            res[gname] = [round(sum(x) / len(x), 3) if x else None, len(x)]
+        return res
+    return {abbr[t]: {'tts': round(sum(x for x, _ in v) / len(v), 3), 'n': len(v), 'groups': groups(v)}
+            for t, v in out.items() if len(v) >= 30}
 
 # ── Scan the schedule ───────────────────────────────────────────────────────
 games = load(GAMES_FILE, {})
@@ -168,6 +179,18 @@ while cur <= today:
             info['line'] = odds.get('overUnder')
             upcoming.append(info)
     cur += timedelta(days=1)
+
+# One-time backfill: games stored before start-type groups were recorded get their play-by-play re-read
+missing = [gid for gid, g in games.items() if 'tts' in g and any('groups' not in v for v in g['tts'].values())]
+if missing:
+    print(f"  Backfilling possession start types for {len(missing)} games")
+for gid in missing[:400]:
+    try:
+        tts = game_tts(get(f"{SUMMARY}?event={gid}"))
+        if len(tts) == 2:
+            games[gid]['tts'] = tts
+    except Exception as e:
+        print(f"  Backfill failed for {gid}: {e}")
 
 with open(GAMES_FILE, 'w') as f:
     json.dump(games, f, separators=(',', ':'))
@@ -274,34 +297,53 @@ for name, n in MODELS.items():
     models[name] = {'record': rec, 'passed_record': record([p for p in hist if p.get('passed')]), 'history': hist, 'watch': watch}
     print(f"  {sum(p['date'] == today.isoformat() for p in hist)} bets today, record {rec['w']}-{rec['l']}-{rec['p']}")
 
-# ── Fast matchups: two clearly fast teams meet -> over ─────────────────────────
-# Each team's season-to-date time to shot at least FAST_MATCHUP s quicker than the league's (10+ games each).
-# 2020-21 to 2025-26 at closing totals: 134-106 (55.8%), and the faster the pair the better (0.5 s: 63.0%);
-# two slow teams going under shows nothing (48.9%), so only the over side is bet.
-FAST_MATCHUP = 0.4
-FAST_MIN_GAMES = 10
+# ── Fast matchups: two of the fastest teams meet -> over ──────────────────────
+# Teams are ranked on game day by season-to-date mix-adjusted time to shot (each game's start types held at the
+# league's shares, so a game full of steals doesn't read fast). When both teams are in the FAST_TOP fastest, bet
+# the over. 2020-21 to 2025-26 at closing totals: 92-64 (59.0%); two slow teams going under shows nothing.
+FAST_TOP = 5
+FAST_MIN_GAMES = 5
 history = {p['id']: p for p in old.get('F', {}).get('history', [])}
-if lg:
-    league = sum(lg) / len(lg)
-    def season_gap(team):
-        h = log.get(team, [])
-        return sum(x[2] for x in h) / len(h) - league if len(h) >= FAST_MIN_GAMES else None
-    for g in upcoming:
-        gh, ga = season_gap(g['home']), season_gap(g['away'])
-        if gh is None or ga is None or gh > -FAST_MATCHUP or ga > -FAST_MATCHUP:
-            continue
-        print(f"  Fast matchup: {g['away']} {ga:+.2f} s @ {g['home']} {gh:+.2f} s -> Over {g['line']}")
-        p = history.get(g['id'])
-        if p is None:
-            history[g['id']] = {'id': g['id'], 'date': g['date'], 'tip': g['tip'],
-                                'matchup': f"{g['away']} @ {g['home']}", 'side': 'Over',
-                                'line': g['line'], 'posted': now, 'passed': False,
-                                'gaps': [round(ga, 2), round(gh, 2)]}
-        elif p.get('line') is None and g['line'] is not None:
-            p['line'] = g['line']
+tot = {k: [0.0, 0] for k in START_GROUPS}
+for g in games.values():
+    for v in g.get('tts', {}).values():
+        for k, (m, cnt) in (v.get('groups') or {}).items():
+            if cnt:
+                tot[k][0] += m * cnt
+                tot[k][1] += cnt
+allp = sum(c for _, c in tot.values())
+mix_log = {}
+if allp:
+    lmean = {k: tot[k][0] / tot[k][1] for k in START_GROUPS if tot[k][1]}
+    share = {k: tot[k][1] / allp for k in START_GROUPS}
+    for g in games.values():
+        for team, v in g.get('tts', {}).items():
+            gr = v.get('groups')
+            if not gr:
+                continue
+            # each start type's gap to the league, shrunk by n/(n+5), weighted at league shares
+            mix_log.setdefault(team, []).append(sum(
+                share[k] * ((gr[k][0] - lmean[k]) * gr[k][1] / (gr[k][1] + 5) if gr[k][1] and k in lmean else 0.0)
+                for k in START_GROUPS))
+ranked = sorted((sum(v) / len(v), t) for t, v in mix_log.items() if len(v) >= FAST_MIN_GAMES)
+fastest = [t for _, t in ranked[:FAST_TOP]] if len(ranked) >= 20 else []
+if fastest:
+    print("  Fastest teams (mix-adjusted): " + ', '.join(f"{t} {m:+.2f}" for m, t in ranked[:FAST_TOP]))
+for g in upcoming:
+    if g['home'] not in fastest or g['away'] not in fastest:
+        continue
+    print(f"  Fast matchup: {g['away']} @ {g['home']} -> Over {g['line']}")
+    p = history.get(g['id'])
+    if p is None:
+        history[g['id']] = {'id': g['id'], 'date': g['date'], 'tip': g['tip'],
+                            'matchup': f"{g['away']} @ {g['home']}", 'side': 'Over',
+                            'line': g['line'], 'posted': now, 'passed': False}
+    elif p.get('line') is None and g['line'] is not None:
+        p['line'] = g['line']
 grade(history)
 hist = sorted(history.values(), key=lambda p: (p['date'], p['tip']), reverse=True)
-models['F'] = {'record': record(hist), 'passed_record': {'w': 0, 'l': 0, 'p': 0, 'units': 0}, 'history': hist, 'watch': []}
+models['F'] = {'record': record(hist), 'passed_record': {'w': 0, 'l': 0, 'p': 0, 'units': 0}, 'history': hist,
+               'watch': [], 'fastest': [{'team': t, 'gap': round(m, 2)} for m, t in ranked[:FAST_TOP]] if fastest else []}
 
 with open(PICKS_FILE, 'w') as f:
     json.dump({'updatedAt': now, 'today': today.isoformat(), 'models': models}, f, indent=1)

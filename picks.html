@@ -72,7 +72,7 @@
   <h2>History</h2>
   <div class="card"><div id="history"></div></div>
 
-  <p class="note">Bets are posted before tip-off and graded against the line shown when posted. One unit per bet. Bets marked Pass are graded but not counted in the record. Tempo watch lists teams whose time to shot moved 0.8 s or more from their baseline in their last game (one game) or in each of their last two (triggered); negative is faster. A triggered team's next game becomes a bet, a Pass if it lost its last game. Fast matchups is a separate record: the over whenever two teams that are each at least 0.4 s quicker than the league average this season meet. Last updated <span id="updated">—</span>.</p>
+  <p class="note">Bets are posted before tip-off and graded against the line shown when posted. One unit per bet. Bets marked Pass are graded but not counted in the record. Tempo watch lists teams whose time to shot moved 0.8 s or more from their baseline in their last game (one game) or in each of their last two (triggered); negative is faster. A triggered team's next game becomes a bet, a Pass if it lost its last game. Fast matchups is a separate record: the over whenever two of the league's five fastest teams meet, ranked on game day by season time to shot adjusted for how possessions started. Last updated <span id="updated">—</span>.</p>
 </div>
 <script>
 const fmtTip = (iso) => iso ? new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
