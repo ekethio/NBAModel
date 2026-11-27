@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-27 18:21 ET",
+ "updatedAt": "2026-11-27 18:29 ET",
  "today": "2026-11-27",
  "models": {
   "A": {
@@ -259,8 +259,8 @@
      "team": "CLE",
      "status": "one game",
      "side": "Over",
-     "last": -0.82,
-     "prev": -0.28,
+     "last": -0.83,
+     "prev": -0.29,
      "last_date": "2026-11-25",
      "last_opp": "NY",
      "won": false
@@ -660,8 +660,8 @@
      "team": "CLE",
      "status": "one game",
      "side": "Over",
-     "last": -1.09,
-     "prev": -0.54,
+     "last": -1.1,
+     "prev": -0.55,
      "last_date": "2026-11-25",
      "last_opp": "NY",
      "won": false
@@ -702,7 +702,29 @@
     "units": 0
    },
    "history": [],
-   "watch": []
+   "watch": [],
+   "fastest": [
+    {
+     "team": "ATL",
+     "gap": -1.17
+    },
+    {
+     "team": "MIA",
+     "gap": -0.91
+    },
+    {
+     "team": "CHI",
+     "gap": -0.55
+    },
+    {
+     "team": "MEM",
+     "gap": -0.42
+    },
+    {
+     "team": "IND",
+     "gap": -0.37
+    }
+   ]
   }
  }
 }
