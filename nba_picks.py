@@ -274,6 +274,35 @@ for name, n in MODELS.items():
     models[name] = {'record': rec, 'passed_record': record([p for p in hist if p.get('passed')]), 'history': hist, 'watch': watch}
     print(f"  {sum(p['date'] == today.isoformat() for p in hist)} bets today, record {rec['w']}-{rec['l']}-{rec['p']}")
 
+# ── Fast matchups: two clearly fast teams meet -> over ─────────────────────────
+# Each team's season-to-date time to shot at least FAST_MATCHUP s quicker than the league's (10+ games each).
+# 2020-21 to 2025-26 at closing totals: 134-106 (55.8%), and the faster the pair the better (0.5 s: 63.0%);
+# two slow teams going under shows nothing (48.9%), so only the over side is bet.
+FAST_MATCHUP = 0.4
+FAST_MIN_GAMES = 10
+history = {p['id']: p for p in old.get('F', {}).get('history', [])}
+if lg:
+    league = sum(lg) / len(lg)
+    def season_gap(team):
+        h = log.get(team, [])
+        return sum(x[2] for x in h) / len(h) - league if len(h) >= FAST_MIN_GAMES else None
+    for g in upcoming:
+        gh, ga = season_gap(g['home']), season_gap(g['away'])
+        if gh is None or ga is None or gh > -FAST_MATCHUP or ga > -FAST_MATCHUP:
+            continue
+        print(f"  Fast matchup: {g['away']} {ga:+.2f} s @ {g['home']} {gh:+.2f} s -> Over {g['line']}")
+        p = history.get(g['id'])
+        if p is None:
+            history[g['id']] = {'id': g['id'], 'date': g['date'], 'tip': g['tip'],
+                                'matchup': f"{g['away']} @ {g['home']}", 'side': 'Over',
+                                'line': g['line'], 'posted': now, 'passed': False,
+                                'gaps': [round(ga, 2), round(gh, 2)]}
+        elif p.get('line') is None and g['line'] is not None:
+            p['line'] = g['line']
+grade(history)
+hist = sorted(history.values(), key=lambda p: (p['date'], p['tip']), reverse=True)
+models['F'] = {'record': record(hist), 'passed_record': {'w': 0, 'l': 0, 'p': 0, 'units': 0}, 'history': hist, 'watch': []}
+
 with open(PICKS_FILE, 'w') as f:
     json.dump({'updatedAt': now, 'today': today.isoformat(), 'models': models}, f, indent=1)
 print(f"Saved {PICKS_FILE}")
