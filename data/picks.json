@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-27 18:35 ET",
+ "updatedAt": "2026-11-27 22:20 ET",
  "today": "2026-11-27",
  "models": {
   "A": {
@@ -196,6 +196,16 @@
      "won": false
     },
     {
+     "team": "BKN",
+     "status": "one game",
+     "side": "Under",
+     "last": 2.49,
+     "prev": 0.1,
+     "last_date": "2026-11-27",
+     "last_opp": "TOR",
+     "won": false
+    },
+    {
      "team": "SA",
      "status": "one game",
      "side": "Under",
@@ -213,6 +223,26 @@
      "prev": 1.14,
      "last_date": "2026-11-23",
      "last_opp": "UTAH",
+     "won": true
+    },
+    {
+     "team": "IND",
+     "status": "one game",
+     "side": "Over",
+     "last": -1.04,
+     "prev": -0.04,
+     "last_date": "2026-11-27",
+     "last_opp": "PHI",
+     "won": false
+    },
+    {
+     "team": "DET",
+     "status": "one game",
+     "side": "Over",
+     "last": -0.97,
+     "prev": 0.88,
+     "last_date": "2026-11-27",
+     "last_opp": "MIL",
      "won": true
     },
     {
@@ -647,6 +677,16 @@
      "won": false
     },
     {
+     "team": "BKN",
+     "status": "one game",
+     "side": "Under",
+     "last": 2.8,
+     "prev": 0.41,
+     "last_date": "2026-11-27",
+     "last_opp": "TOR",
+     "won": false
+    },
+    {
      "team": "SA",
      "status": "one game",
      "side": "Under",
@@ -667,6 +707,16 @@
      "won": false
     },
     {
+     "team": "DET",
+     "status": "one game",
+     "side": "Over",
+     "last": -1.07,
+     "prev": 0.77,
+     "last_date": "2026-11-27",
+     "last_opp": "MIL",
+     "won": true
+    },
+    {
      "team": "POR",
      "status": "one game",
      "side": "Over",
@@ -675,6 +725,16 @@
      "last_date": "2026-11-25",
      "last_opp": "SA",
      "won": true
+    },
+    {
+     "team": "IND",
+     "status": "one game",
+     "side": "Over",
+     "last": -0.9,
+     "prev": 0.1,
+     "last_date": "2026-11-27",
+     "last_opp": "PHI",
+     "won": false
     },
     {
      "team": "PHX",
@@ -706,11 +766,11 @@
    "fastest": [
     {
      "team": "ATL",
-     "gap": -1.17
+     "gap": -1.18
     },
     {
      "team": "MIA",
-     "gap": -0.91
+     "gap": -0.89
     },
     {
      "team": "CHI",
@@ -718,11 +778,11 @@
     },
     {
      "team": "MEM",
-     "gap": -0.42
+     "gap": -0.43
     },
     {
      "team": "IND",
-     "gap": -0.37
+     "gap": -0.4
     }
    ]
   }
